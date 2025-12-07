@@ -1,0 +1,13 @@
+# Render için Next.js Web Service yapılandırması
+services:
+  - type: web
+    name: graphzy-web
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    # Publish directory: Next.js için gerekmez (Web Service kullanıyoruz)
+    # Static Site için: publishDir: out
+    # Web Service için: publishDir boş bırakılmalı
+    envVars:
+      - key: NODE_ENV
+        value: production
