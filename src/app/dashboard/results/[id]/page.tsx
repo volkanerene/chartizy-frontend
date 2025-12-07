@@ -42,7 +42,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CodeBlock } from "@/components/CodeBlock";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
-import { InteractiveChart } from "@/components/InteractiveChart";
+import { InteractiveChart, type InteractiveChartRef } from "@/components/InteractiveChart";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 
@@ -64,7 +64,7 @@ ChartJS.register(
 export default function ResultsPage() {
   const params = useParams();
   const router = useRouter();
-  const chartRef = useRef<ChartJS>(null);
+  const chartRef = useRef<InteractiveChartRef>(null);
   const { token, chartResult, setChartResult } = useStore();
 
   const [isLoading, setIsLoading] = useState(!chartResult);
@@ -159,10 +159,17 @@ export default function ResultsPage() {
 
   const handleDownloadPNG = () => {
     if (chartRef.current) {
-      const link = document.createElement("a");
-      link.download = `graphzy-chart-${chartId}.png`;
-      link.href = chartRef.current.toBase64Image();
-      link.click();
+      const base64 = chartRef.current.toBase64Image();
+      if (base64) {
+        const chartTitle = (chartConfig?.data as { title?: string })?.title ||
+                          (chartConfig?.options as { title?: { display?: boolean; text?: string } })?.title?.text || 
+                          "chart";
+        const filename = `${chartTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}-${chartId.slice(0, 8)}.png`;
+        const link = document.createElement("a");
+        link.download = filename;
+        link.href = base64;
+        link.click();
+      }
     }
   };
 
@@ -224,7 +231,9 @@ export default function ResultsPage() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">
-                Your Chart
+                {(chartConfig?.data as { title?: string })?.title ||
+                 (chartConfig?.options as { title?: { display?: boolean; text?: string } })?.title?.text || 
+                 "Your Chart"}
               </h1>
               <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full flex items-center gap-1">
                 <Sparkles className="w-3 h-3" />
@@ -289,9 +298,9 @@ export default function ResultsPage() {
                 "p-4 rounded-2xl border-2 transition-all hover:shadow-md",
                 stat.highlight
                   ? stat.positive
-                    ? "bg-gradient-to-br from-green-50 to-emerald-50 border-green-200"
-                    : "bg-gradient-to-br from-red-50 to-rose-50 border-red-200"
-                  : "bg-white/70 border-violet-100"
+                    ? "bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800"
+                    : "bg-gradient-to-br from-red-50 to-rose-50 dark:from-red-900/20 dark:to-rose-900/20 border-red-200 dark:border-red-800"
+                  : "bg-white/70 dark:bg-slate-800/70 border-violet-100 dark:border-slate-700"
               )}
             >
               <div className="text-lg mb-1">{stat.icon}</div>
@@ -300,14 +309,14 @@ export default function ResultsPage() {
                   "text-xl font-bold",
                   stat.highlight
                     ? stat.positive
-                      ? "text-green-600"
-                      : "text-red-600"
-                    : "text-slate-900"
+                      ? "text-green-600 dark:text-green-400"
+                      : "text-red-600 dark:text-red-400"
+                    : "text-slate-900 dark:text-slate-100"
                 )}
               >
                 {stat.value}
               </div>
-              <div className="text-xs text-slate-500">{stat.label}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">{stat.label}</div>
             </motion.div>
           ))}
         </motion.div>
@@ -318,11 +327,15 @@ export default function ResultsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="bg-white/70 backdrop-blur-xl rounded-3xl border-2 border-violet-100/50 shadow-xl shadow-violet-500/5 overflow-hidden"
+        className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl border-2 border-violet-100/50 dark:border-slate-700/50 shadow-xl shadow-violet-500/5 dark:shadow-slate-900/20 overflow-hidden"
       >
         <div className="p-2 border-b border-violet-100 flex items-center justify-between">
           <div className="flex items-center gap-2 px-4">
-            <span className="text-sm text-slate-500">Interactive Chart</span>
+            <span className="text-sm font-semibold text-slate-900">
+              {(chartConfig?.data as { title?: string })?.title ||
+               (chartConfig?.options as { title?: { display?: boolean; text?: string } })?.title?.text || 
+               "Interactive Chart"}
+            </span>
             <span className="text-xs bg-violet-100 text-violet-700 px-2 py-0.5 rounded-full">
               Hover for details
             </span>
@@ -332,7 +345,7 @@ export default function ResultsPage() {
               onClick={() => setShowStats(!showStats)}
               className={cn(
                 "p-2 rounded-lg transition-colors text-sm",
-                showStats ? "bg-violet-100 text-violet-700" : "text-slate-400 hover:text-slate-600"
+                showStats ? "bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400" : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
               )}
             >
               Stats
@@ -341,6 +354,7 @@ export default function ResultsPage() {
         </div>
         <div className="p-4">
           <InteractiveChart
+            ref={chartRef}
             chartConfig={chartConfig as never}
             height={450}
             showPercentChange
@@ -358,7 +372,7 @@ export default function ResultsPage() {
           transition={{ delay: 0.15 }}
           className="bg-gradient-to-r from-violet-50 to-purple-50 rounded-2xl border-2 border-violet-200 p-6"
         >
-          <h3 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+          <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-violet-500" />
             AI Insights
           </h3>
@@ -369,7 +383,7 @@ export default function ResultsPage() {
               ) : (
                 <TrendingDown className="w-5 h-5 text-red-500 mt-0.5" />
               )}
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 Your data shows a{" "}
                 <span className={stats.totalChange >= 0 ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
                   {Math.abs(stats.totalChange).toFixed(1)}% {stats.totalChange >= 0 ? "increase" : "decrease"}
@@ -379,7 +393,7 @@ export default function ResultsPage() {
             </div>
             <div className="flex items-start gap-3">
               <span className="text-lg">📊</span>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 The highest value is{" "}
                 <span className="text-violet-600 font-medium">{((stats.max / stats.avg - 1) * 100).toFixed(0)}%</span>{" "}
                 above average, while the lowest is{" "}
@@ -396,7 +410,7 @@ export default function ResultsPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="bg-white/70 backdrop-blur-xl rounded-3xl border-2 border-violet-100/50 shadow-xl shadow-violet-500/5 overflow-hidden"
+        className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl rounded-3xl border-2 border-violet-100/50 dark:border-slate-700/50 shadow-xl shadow-violet-500/5 dark:shadow-slate-900/20 overflow-hidden"
       >
         <Tabs defaultValue="jsx" className="w-full">
           <div className="border-b border-violet-100 px-6 pt-4">
@@ -418,7 +432,7 @@ export default function ResultsPage() {
 
           <TabsContent value="jsx" className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 React component using react-chartjs-2
               </p>
               <Button
@@ -444,7 +458,7 @@ export default function ResultsPage() {
 
           <TabsContent value="json" className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-slate-500">Chart.js configuration object</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">Chart.js configuration object</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -473,7 +487,7 @@ export default function ResultsPage() {
 
           <TabsContent value="config" className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 Full chart configuration with options
               </p>
               <Button

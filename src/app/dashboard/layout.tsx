@@ -23,6 +23,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PremiumBadge } from "@/components/PremiumBadge";
 import { PricingModal } from "@/components/PricingModal";
+import { paymentApi } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -38,7 +39,7 @@ export default function DashboardLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { user, isAuthenticated, chartQuota, token } = useStore();
+  const { user, isAuthenticated, chartQuota, token, setUser } = useStore();
   const { signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
@@ -55,12 +56,22 @@ export default function DashboardLayout({
       
       if (!session && !isAuthenticated) {
         router.push("/login");
+        setAuthChecked(true);
+        return;
       }
+
+      // Check if user needs onboarding
+      if (session && user && (!user.first_name || !user.last_name)) {
+        router.push("/onboarding");
+        setAuthChecked(true);
+        return;
+      }
+      
       setAuthChecked(true);
     };
 
     checkAuth();
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, router, user]);
 
   // Show loading while checking auth
   if (!authChecked) {
@@ -84,21 +95,21 @@ export default function DashboardLayout({
   const quotaPercentage = isPro ? 100 : (chartQuota.used / chartQuota.limit) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-cyan-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-cyan-50/30 dark:from-slate-900 dark:via-slate-800/50 dark:to-slate-900">
       {/* Mobile header */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-xl border-b border-violet-100 z-40 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-b border-violet-100 dark:border-slate-700 z-40 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setSidebarOpen(true)}
             className="p-2 rounded-xl hover:bg-violet-100 transition-colors"
           >
-            <Menu className="w-5 h-5 text-slate-600" />
+            <Menu className="w-5 h-5 text-slate-600 dark:text-slate-300" />
           </button>
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
               <BarChart3 className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-slate-900">Graphzy</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">Graphzy</span>
           </div>
         </div>
         <Avatar className="h-9 w-9">
@@ -124,20 +135,20 @@ export default function DashboardLayout({
               animate={{ x: 0 }}
               exit={{ x: -300 }}
               transition={{ type: "spring", damping: 25 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white z-50 shadow-2xl"
+              className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white dark:bg-slate-800 z-50 shadow-2xl"
             >
-              <div className="p-4 flex items-center justify-between border-b border-violet-100">
+              <div className="p-4 flex items-center justify-between border-b border-violet-100 dark:border-slate-700">
                 <div className="flex items-center gap-2">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                     <BarChart3 className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-bold text-xl text-slate-900">Graphzy</span>
+                  <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Graphzy</span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
-                  className="p-2 rounded-xl hover:bg-violet-100 transition-colors"
+                  className="p-2 rounded-xl hover:bg-violet-100 dark:hover:bg-slate-700 transition-colors"
                 >
-                  <X className="w-5 h-5 text-slate-600" />
+                  <X className="w-5 h-5 text-slate-600 dark:text-slate-300" />
                 </button>
               </div>
               <SidebarContent
@@ -156,13 +167,13 @@ export default function DashboardLayout({
       </AnimatePresence>
 
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-white/80 backdrop-blur-xl border-r border-violet-100 z-40">
-        <div className="p-6 border-b border-violet-100">
+      <aside className="hidden lg:flex flex-col fixed left-0 top-0 bottom-0 w-64 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-r border-violet-100 dark:border-slate-700 z-40">
+        <div className="p-6 border-b border-violet-100 dark:border-slate-700">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
               <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-slate-900">Graphzy</span>
+            <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Graphzy</span>
           </div>
         </div>
         <SidebarContent
@@ -185,10 +196,39 @@ export default function DashboardLayout({
       <PricingModal
         isOpen={pricingOpen}
         onClose={() => setPricingOpen(false)}
-        onUpgrade={() => {
-          // Handle upgrade - integrate with Stripe
-          console.log("Upgrade to Pro");
-          setPricingOpen(false);
+        onUpgrade={async () => {
+          // Handle upgrade with PayTR
+          if (!token || !user) {
+            alert("Please log in to upgrade");
+            return;
+          }
+          
+          try {
+            // Create PayTR payment session
+            const result = await paymentApi.createPayTRSession(
+              299.99, // 299.99 TL/month (approximately $9.99)
+              `${window.location.origin}/dashboard?upgraded=true&payment=success`,
+              `${window.location.origin}/dashboard?upgraded=false&payment=failed`,
+              token
+            );
+            
+            if (result.success && result.redirect_url) {
+              // Store order_id for tracking
+              sessionStorage.setItem("paytr_order_id", result.order_id);
+              // Redirect to PayTR payment page
+              window.location.href = result.redirect_url;
+            } else if (result.success && result.iframe_url) {
+              // If iframe_url is returned, use that
+              sessionStorage.setItem("paytr_order_id", result.order_id);
+              window.location.href = result.iframe_url;
+            } else {
+              throw new Error("Failed to create PayTR session");
+            }
+          } catch (error) {
+            console.error("Upgrade error:", error);
+            alert("Failed to start upgrade process. Please try again later.");
+            setPricingOpen(false);
+          }
         }}
       />
     </div>
@@ -231,7 +271,7 @@ function SidebarContent({
                 "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
                 isActive
                   ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/30"
-                  : "text-slate-600 hover:bg-violet-50 hover:text-violet-700"
+                  : "text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-700 dark:hover:text-violet-400"
               )}
             >
               <item.icon className="w-5 h-5" />
@@ -249,13 +289,13 @@ function SidebarContent({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 p-4 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border border-violet-100"
+          className="mt-6 p-4 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 border border-violet-100 dark:border-slate-700"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm font-medium text-slate-700">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Charts Used
             </span>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-slate-500 dark:text-slate-400">
               {chartQuota.used}/{chartQuota.limit}
             </span>
           </div>
@@ -283,7 +323,7 @@ function SidebarContent({
       <div className="flex-1" />
 
       {/* User section */}
-      <div className="pt-4 border-t border-violet-100 space-y-2">
+      <div className="pt-4 border-t border-violet-100 dark:border-slate-700 space-y-2">
         <div className="flex items-center gap-3 px-3 py-2">
           <Avatar className="h-10 w-10">
             <AvatarFallback>
@@ -291,35 +331,36 @@ function SidebarContent({
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-slate-900 truncate">
+            <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
               {user?.email}
             </p>
             <div className="flex items-center gap-2">
               {isPro ? (
                 <PremiumBadge size="sm" />
               ) : (
-                <span className="text-xs text-slate-500">Free Plan</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">Free Plan</span>
               )}
             </div>
           </div>
         </div>
 
-        <button
+        <Link
+          href="/dashboard/settings"
           onClick={() => {
             onNavigate?.();
           }}
-          className="flex items-center gap-3 w-full px-4 py-2 rounded-xl text-sm text-slate-600 hover:bg-violet-50 hover:text-violet-700 transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-2 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 hover:text-violet-700 dark:hover:text-violet-400 transition-colors"
         >
           <Settings className="w-5 h-5" />
           Settings
-        </button>
+        </Link>
 
         <button
           onClick={() => {
             onSignOut();
             onNavigate?.();
           }}
-          className="flex items-center gap-3 w-full px-4 py-2 rounded-xl text-sm text-red-600 hover:bg-red-50 transition-colors"
+          className="flex items-center gap-3 w-full px-4 py-2 rounded-xl text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
         >
           <LogOut className="w-5 h-5" />
           Sign Out

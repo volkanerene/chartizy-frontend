@@ -410,6 +410,7 @@ export default function GeneratePage() {
             data: parsedData.values,
           },
         ],
+        title: chartTitle || "Chart", // Include title in data
       };
 
       const result = await chartsApi.generate(

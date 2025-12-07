@@ -2,18 +2,48 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Plus, BarChart3, TrendingUp, Clock, Sparkles } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import { chartsApi } from "@/lib/api";
+import { chartsApi, paymentApi } from "@/lib/api";
 import { ChartCard } from "@/components/ChartCard";
 import { GradientButton } from "@/components/GradientButton";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
-  const { user, token, userCharts, setUserCharts, chartQuota } = useStore();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { user, token, userCharts, setUserCharts, chartQuota, setUser } = useStore();
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Handle PayTR payment callback
+  useEffect(() => {
+    const upgraded = searchParams?.get("upgraded");
+    const paymentStatus = searchParams?.get("payment");
+    
+    if (upgraded === "true" && paymentStatus === "success" && user) {
+      // PayTR callback is handled server-side, but we update UI here
+      // The backend webhook already updated the subscription
+      setUser({
+        ...user,
+        subscription_tier: "pro",
+      });
+      // Clean up
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("paytr_order_id");
+      }
+      // Remove query params
+      router.replace("/dashboard");
+    } else if (paymentStatus === "failed") {
+      // Payment failed
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("paytr_order_id");
+      }
+      router.replace("/dashboard");
+    }
+  }, [searchParams, user, setUser, router]);
 
   useEffect(() => {
     const fetchCharts = async () => {
@@ -67,10 +97,10 @@ export default function DashboardPage() {
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">
+          <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100">
             Welcome back{user?.email ? `, ${user.email.split("@")[0]}` : ""}!
           </h1>
-          <p className="text-slate-500 mt-1">
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
             Here&apos;s an overview of your charts and activity.
           </p>
         </div>
@@ -95,7 +125,7 @@ export default function DashboardPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 + i * 0.1 }}
-            className="relative overflow-hidden rounded-2xl bg-white/70 backdrop-blur-xl border-2 border-violet-100/50 p-6 shadow-lg shadow-violet-500/5"
+            className="relative overflow-hidden rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-2 border-violet-100/50 dark:border-slate-700/50 p-6 shadow-lg shadow-violet-500/5 dark:shadow-slate-900/20"
           >
             <div className={cn(
               "absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full opacity-10 bg-gradient-to-br",
@@ -107,8 +137,8 @@ export default function DashboardPage() {
             )}>
               <stat.icon className="w-6 h-6 text-white" />
             </div>
-            <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
-            <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+            <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{stat.value}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{stat.label}</p>
           </motion.div>
         ))}
       </motion.div>
@@ -120,11 +150,11 @@ export default function DashboardPage() {
         transition={{ delay: 0.3 }}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-slate-900">Your Charts</h2>
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Your Charts</h2>
           {userCharts.length > 0 && (
             <Link
               href="/dashboard/templates"
-              className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+              className="text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium"
             >
               View All Templates →
             </Link>
@@ -147,7 +177,7 @@ export default function DashboardPage() {
                 <ChartCard
                   chart={chart}
                   onClick={() => {
-                    // Navigate to result page
+                    router.push(`/dashboard/results/${chart.id}`);
                   }}
                   onDelete={async () => {
                     if (!token) return;
@@ -171,10 +201,10 @@ export default function DashboardPage() {
             <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center mb-6">
               <Sparkles className="w-10 h-10 text-violet-500" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
               No charts yet
             </h3>
-            <p className="text-slate-500 mb-6 max-w-md mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
               Start by selecting a template and let AI generate beautiful
               visualizations from your data.
             </p>

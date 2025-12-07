@@ -15,6 +15,12 @@ async function apiRequest<T>(endpoint: string, options: ApiOptions = {}): Promis
 
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
+  } else {
+    // Try to get token from localStorage if not provided
+    const storedToken = typeof window !== "undefined" ? localStorage.getItem("graphzy-token") : null;
+    if (storedToken) {
+      headers["Authorization"] = `Bearer ${storedToken}`;
+    }
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
@@ -25,7 +31,9 @@ async function apiRequest<T>(endpoint: string, options: ApiOptions = {}): Promis
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({ detail: "Request failed" }));
-    throw new Error(error.detail || "Request failed");
+    const errorMessage = error.detail || error.message || `Request failed with status ${response.status}`;
+    console.error(`API Error [${response.status}]: ${endpoint}`, errorMessage);
+    throw new Error(errorMessage);
   }
 
   return response.json();
@@ -61,6 +69,8 @@ export const authApi = {
     apiRequest<{
       id: string;
       email: string;
+      first_name?: string | null;
+      last_name?: string | null;
       subscription_tier: string;
       chart_count: number;
       created_at: string;
@@ -159,6 +169,49 @@ export const aiApi = {
     apiRequest<AIGenerateDataResponse>("/ai/generate-data", {
       method: "POST",
       body: { description, data_points: dataPoints, chart_type: chartType },
+      token,
+    }),
+};
+
+// Profile API
+export const profileApi = {
+  updateProfile: (data: { first_name?: string; last_name?: string }, token: string) =>
+    apiRequest<{ success: boolean; message: string; first_name?: string; last_name?: string }>("/profile/update", {
+      method: "PUT",
+      body: data,
+      token,
+    }),
+};
+
+// Payment API (PayTR - works in Turkey, both web and mobile)
+export const paymentApi = {
+  createPayTRSession: (amount: number, successUrl: string, failUrl: string, token: string) =>
+    apiRequest<{ success: boolean; order_id: string; iframe_url: string; redirect_url: string }>("/payment/create-paytr-session", {
+      method: "POST",
+      body: {
+        amount,
+        success_url: successUrl,
+        fail_url: failUrl,
+        user_id: "", // Will be set by backend from token
+      },
+      token,
+    }),
+  // Keep PayPal for backward compatibility (optional)
+  createPayPalSession: (amount: number, successUrl: string, cancelUrl: string, token: string) =>
+    apiRequest<{ order_id: string; approval_url: string }>("/payment/create-paypal-session", {
+      method: "POST",
+      body: {
+        amount,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+        currency: "USD",
+      },
+      token,
+    }),
+  capturePayPalPayment: (orderId: string, token: string) =>
+    apiRequest<{ success: boolean; order_id: string; status: string }>("/payment/capture-paypal-payment", {
+      method: "POST",
+      body: { order_id: orderId },
       token,
     }),
 };

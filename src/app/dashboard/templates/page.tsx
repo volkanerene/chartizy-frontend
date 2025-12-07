@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search, Filter, Grid3X3, List } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import { templatesApi } from "@/lib/api";
+import { templatesApi, paymentApi } from "@/lib/api";
 import { TemplateCard } from "@/components/TemplateCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -83,10 +83,10 @@ export default function TemplatesPage() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        <h1 className="text-2xl lg:text-3xl font-bold text-slate-900">
+        <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100">
           Chart Templates
         </h1>
-        <p className="text-slate-500 mt-1">
+        <p className="text-slate-500 dark:text-slate-400 mt-1">
           Choose a template to get started with your visualization.
         </p>
       </motion.div>
@@ -119,7 +119,7 @@ export default function TemplatesPage() {
                 "px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200",
                 activeCategory === category.id
                   ? "bg-gradient-to-r from-violet-500 to-purple-500 text-white shadow-lg shadow-violet-500/30"
-                  : "bg-white/70 text-slate-600 hover:bg-violet-50 border border-violet-100"
+                  : "bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 border border-violet-100 dark:border-slate-700"
               )}
             >
               {category.label}
@@ -128,14 +128,14 @@ export default function TemplatesPage() {
         </div>
 
         {/* View Toggle */}
-        <div className="flex items-center gap-1 bg-white/70 rounded-xl p-1 border border-violet-100">
+        <div className="flex items-center gap-1 bg-white/70 dark:bg-slate-800/70 rounded-xl p-1 border border-violet-100 dark:border-slate-700">
           <button
             onClick={() => setViewMode("grid")}
             className={cn(
               "p-2 rounded-lg transition-colors",
               viewMode === "grid"
                 ? "bg-violet-100 text-violet-700"
-                : "text-slate-400 hover:text-slate-600"
+                : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             )}
           >
             <Grid3X3 className="w-5 h-5" />
@@ -146,7 +146,7 @@ export default function TemplatesPage() {
               "p-2 rounded-lg transition-colors",
               viewMode === "list"
                 ? "bg-violet-100 text-violet-700"
-                : "text-slate-400 hover:text-slate-600"
+                : "text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300"
             )}
           >
             <List className="w-5 h-5" />
@@ -192,10 +192,10 @@ export default function TemplatesPage() {
           className="text-center py-16 px-4 rounded-3xl bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-dashed border-violet-200"
         >
           <Filter className="w-12 h-12 mx-auto text-violet-400 mb-4" />
-          <h3 className="text-xl font-semibold text-slate-900 mb-2">
+          <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
             No templates found
           </h3>
-          <p className="text-slate-500">
+          <p className="text-slate-500 dark:text-slate-400">
             Try adjusting your search or filter criteria.
           </p>
           <Button
@@ -215,9 +215,35 @@ export default function TemplatesPage() {
       <PricingModal
         isOpen={pricingOpen}
         onClose={() => setPricingOpen(false)}
-        onUpgrade={() => {
-          console.log("Upgrade to Pro");
-          setPricingOpen(false);
+        onUpgrade={async () => {
+          // Handle upgrade with PayTR
+          if (!token || !user) {
+            alert("Please log in to upgrade");
+            return;
+          }
+          
+          try {
+            const result = await paymentApi.createPayTRSession(
+              299.99,
+              `${window.location.origin}/dashboard?upgraded=true&payment=success`,
+              `${window.location.origin}/dashboard?upgraded=false&payment=failed`,
+              token
+            );
+            
+            if (result.success && result.redirect_url) {
+              sessionStorage.setItem("paytr_order_id", result.order_id);
+              window.location.href = result.redirect_url;
+            } else if (result.success && result.iframe_url) {
+              sessionStorage.setItem("paytr_order_id", result.order_id);
+              window.location.href = result.iframe_url;
+            } else {
+              throw new Error("Failed to create PayTR session");
+            }
+          } catch (error) {
+            console.error("Upgrade error:", error);
+            alert("Failed to start upgrade process. Please try again later.");
+            setPricingOpen(false);
+          }
         }}
       />
     </div>

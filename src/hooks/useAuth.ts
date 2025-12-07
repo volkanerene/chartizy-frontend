@@ -21,13 +21,15 @@ export function useAuth() {
 
           // Fetch user data from our API
           try {
-            const userData = await authApi.me(accessToken);
-            setUser({
-              id: userData.id,
-              email: userData.email,
-              subscription_tier: userData.subscription_tier as "free" | "pro",
-              chart_count: userData.chart_count,
-            });
+          const userData = await authApi.me(accessToken);
+          setUser({
+            id: userData.id,
+            email: userData.email,
+            subscription_tier: userData.subscription_tier as "free" | "pro",
+            chart_count: userData.chart_count,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+          });
           } catch {
             // If API call fails, use Supabase user data
             const supabaseUser = await getUser();
@@ -37,6 +39,8 @@ export function useAuth() {
                 email: supabaseUser.email || "",
                 subscription_tier: "free",
                 chart_count: 0,
+                first_name: null,
+                last_name: null,
               });
             }
           }
@@ -96,17 +100,27 @@ export function useAuth() {
             email: userData.email,
             subscription_tier: userData.subscription_tier as "free" | "pro",
             chart_count: userData.chart_count,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
           });
+          
+          // Check if user has completed onboarding (has first_name and last_name)
+          if (!userData.first_name || !userData.last_name) {
+            router.push("/onboarding");
+          } else {
+            router.push("/dashboard");
+          }
         } catch {
           setUser({
             id: data.user?.id || "",
             email: data.user?.email || "",
             subscription_tier: "free",
             chart_count: 0,
+            first_name: null,
+            last_name: null,
           });
+          router.push("/onboarding");
         }
-
-        router.push("/dashboard");
       }
     },
     [router, setToken, setUser]

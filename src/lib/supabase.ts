@@ -7,7 +7,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn("Supabase credentials not configured. Please set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    detectSessionInUrl: true, // Automatically detect session from URL hash
+    autoRefreshToken: true,
+    persistSession: true,
+  },
+});
 
 export type AuthError = {
   message: string;

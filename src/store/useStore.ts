@@ -7,6 +7,8 @@ interface User {
   email: string;
   subscription_tier: "free" | "pro";
   chart_count: number;
+  first_name?: string | null;
+  last_name?: string | null;
 }
 
 interface AppState {
