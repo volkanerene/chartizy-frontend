@@ -32,6 +32,11 @@ export const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>
       isLoading = false,
       children,
       disabled,
+      onDrag,
+      onDragStart,
+      onDragEnd,
+      onAnimationStart,
+      onAnimationEnd,
       ...props
     },
     ref
@@ -52,7 +57,7 @@ export const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>
           className
         )}
         disabled={disabled || isLoading}
-        {...props}
+        {...(props as any)}
       >
         {/* Animated shine effect */}
         <motion.div

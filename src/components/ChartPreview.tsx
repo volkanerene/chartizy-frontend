@@ -14,7 +14,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { Line, Bar, Pie, Doughnut, Radar, Scatter } from "react-chartjs-2";
+import { Line, Bar, Pie, Doughnut, Radar, Scatter, Chart } from "react-chartjs-2";
 
 ChartJS.register(
   CategoryScale,
@@ -191,7 +191,6 @@ function ChartPreviewComponent({
                   data: sampleValues.slice(0, 4),
                   backgroundColor: colors.slice(0, 4),
                   borderWidth: 0,
-                  cutout: "65%",
                   hoverOffset: 6,
                 },
               ],
@@ -199,6 +198,7 @@ function ChartPreviewComponent({
             options={{
               ...baseOptions,
               scales: undefined,
+              cutout: "65%",
             } as never}
           />
         );
@@ -301,7 +301,8 @@ function ChartPreviewComponent({
 
       case "combo":
         return (
-          <Bar
+          <Chart
+            type="bar"
             data={{
               labels: sampleLabels,
               datasets: [

@@ -122,7 +122,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
     padding: 16,
     boxPadding: 8,
     usePointStyle: true,
-    titleFont: { size: 14, weight: "600" as const },
+    titleFont: { size: 14, weight: "bold" as const },
     bodyFont: { size: 13 },
     displayColors: true,
     callbacks: {
@@ -175,7 +175,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
               "Chart",
         font: {
           size: 18,
-          weight: "600",
+          weight: "bold" as const,
         },
         color: theme === "dark" ? "#F8FAFC" : "#1E293B",
         padding: {
@@ -191,7 +191,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
           usePointStyle: true,
           pointStyle: "circle",
           padding: 20,
-          font: { size: 12, weight: "500" },
+          font: { size: 12, weight: "normal" as const },
           color: theme === "dark" ? "#CBD5E1" : "#64748B",
         },
       },
@@ -217,7 +217,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
           text: datasets[0]?.label || "Value",
           font: {
             size: 14,
-            weight: "600",
+            weight: "bold" as const,
           },
           color: theme === "dark" ? "#CBD5E1" : "#64748B",
           padding: {
@@ -277,7 +277,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
 
     return {
       labels,
-      datasets: styledDatasets,
+      datasets: styledDatasets as any,
     };
   };
 
@@ -458,9 +458,11 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
 
           return (
             <Plot
-              data={[plotlyConfig]}
+              data={[plotlyConfig] as any}
               layout={{
-                title: chartConfig.options?.title?.text || "",
+                title: {
+                  text: (chartConfig.options as any)?.title?.text || "",
+                },
                 scene: {
                   xaxis: { title: "X Axis" },
                   yaxis: { title: "Y Axis" },
@@ -471,7 +473,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
                 margin: { l: 0, r: 0, t: 40, b: 0 },
                 paper_bgcolor: "transparent",
                 plot_bgcolor: "transparent",
-              }}
+              } as any}
               style={{ width: "100%", height: "100%" }}
               config={{ responsive: true, displayModeBar: true }}
             />
