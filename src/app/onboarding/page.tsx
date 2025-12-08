@@ -92,10 +92,33 @@ export default function OnboardingPage() {
           
           // Update user state with new profile data
           if (result.success) {
+            // Fetch fresh user data from backend to ensure consistency
+            try {
+              const { authApi } = await import("@/lib/api");
+              const freshUserData = await authApi.me(token);
+              setUser({
+                id: freshUserData.id,
+                email: freshUserData.email,
+                subscription_tier: freshUserData.subscription_tier as "free" | "pro",
+                chart_count: freshUserData.chart_count,
+                first_name: freshUserData.first_name || firstName,
+                last_name: freshUserData.last_name || lastName,
+              });
+            } catch (error) {
+              console.error("Failed to fetch fresh user data:", error);
+              // Fallback: update with result data
+              setUser({
+                ...user,
+                first_name: result.first_name || firstName,
+                last_name: result.last_name || lastName,
+              });
+            }
+          } else {
+            // Update user state anyway so onboarding doesn't loop
             setUser({
               ...user,
-              first_name: result.first_name || firstName,
-              last_name: result.last_name || lastName,
+              first_name: firstName,
+              last_name: lastName,
             });
           }
           
