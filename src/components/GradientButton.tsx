@@ -12,7 +12,7 @@ interface GradientButtonProps
 }
 
 const gradientVariants = {
-  primary: "from-violet-500 via-purple-500 to-fuchsia-500",
+  primary: "from-blue-500 via-indigo-500 to-cyan-500",
   secondary: "from-cyan-500 via-blue-500 to-indigo-500",
   success: "from-emerald-500 via-green-500 to-teal-500",
 };
@@ -51,7 +51,7 @@ export const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>
           "bg-gradient-to-r",
           gradientVariants[variant],
           sizeVariants[size],
-          "shadow-violet-500/30 hover:shadow-violet-500/50",
+          "shadow-blue-500/30 hover:shadow-blue-500/50",
           "disabled:opacity-50 disabled:cursor-not-allowed",
           "overflow-hidden",
           className

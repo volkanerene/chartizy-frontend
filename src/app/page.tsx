@@ -30,7 +30,7 @@ const features = [
     icon: Sparkles,
     title: "AI-Powered Generation",
     description: "Let AI analyze your data and create stunning visualizations automatically",
-    color: "from-violet-500 to-purple-500",
+    color: "from-blue-500 to-indigo-500",
   },
   {
     icon: Zap,
@@ -48,7 +48,7 @@ const features = [
     icon: Globe,
     title: "Multiple Formats",
     description: "Export to PNG, JSON, or embed directly in your projects",
-    color: "from-pink-500 to-rose-500",
+    color: "from-sky-500 to-cyan-500",
   },
 ];
 
@@ -113,31 +113,31 @@ export default function LandingPage() {
   const scale = useTransform(scrollYProgress, [0, 0.3], [1, 0.95]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-cyan-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-cyan-50/30 dark:from-slate-900 dark:via-slate-800/50 dark:to-slate-900">
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-b border-violet-100 dark:border-slate-700"
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl border-b border-blue-100 dark:border-slate-700"
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
               <BarChart3 className="w-6 h-6 text-white" />
             </div>
             <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Graphzy</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
-            <Link href="#features" className="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+            <Link href="#features" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               Features
             </Link>
-            <Link href="#how-it-works" className="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+            <Link href="#how-it-works" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               How It Works
             </Link>
-            <Link href="/pricing" className="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+            <Link href="/pricing" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               Pricing
             </Link>
-            <Link href="/mobile" className="text-slate-600 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
+            <Link href="/mobile" className="text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
               Mobile
             </Link>
           </div>
@@ -146,7 +146,7 @@ export default function LandingPage() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-full"
+              className="rounded-full text-white dark:text-slate-300"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? (
@@ -156,7 +156,7 @@ export default function LandingPage() {
               )}
             </Button>
             <Link href="/login">
-              <Button variant="ghost">Sign In</Button>
+              <Button variant="ghost" className="text-white dark:text-slate-300">Sign In</Button>
             </Link>
             <Link href="/login">
               <GradientButton>Get Started</GradientButton>
@@ -171,7 +171,7 @@ export default function LandingPage() {
           style={{ opacity, scale }}
           className="absolute inset-0 flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-violet-500/10 via-purple-500/5 to-cyan-500/10 blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-indigo-500/5 to-cyan-500/10 blur-3xl" />
         </motion.div>
 
         {/* Floating Transparent Shapes - Optimized */}
@@ -200,10 +200,10 @@ export default function LandingPage() {
             <div
               className={`w-full h-full rounded-full opacity-10 blur-xl ${
                 i % 3 === 0
-                  ? "bg-gradient-to-br from-violet-400 to-purple-500"
+                  ? "bg-gradient-to-br from-blue-400 to-indigo-500"
                   : i % 3 === 1
                   ? "bg-gradient-to-br from-cyan-400 to-blue-500"
-                  : "bg-gradient-to-br from-pink-400 to-rose-500"
+                  : "bg-gradient-to-br from-sky-400 to-cyan-500"
               }`}
             />
           </motion.div>
@@ -234,7 +234,7 @@ export default function LandingPage() {
             }}
           >
             <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center">
-              <item.icon className="w-8 h-8 text-violet-400" />
+              <item.icon className="w-8 h-8 text-blue-400" />
             </div>
           </motion.div>
         ))}
@@ -250,12 +250,12 @@ export default function LandingPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-sm font-medium mb-6"
             >
               <Sparkles className="w-4 h-4" />
               AI-Powered Chart Generation
             </motion.div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 bg-clip-text text-transparent">
               Create Stunning Charts
               <br />
               <span className="text-slate-900">In Seconds</span>
@@ -303,11 +303,11 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 + i * 0.1 }}
-                className="p-6 rounded-2xl bg-white/70 backdrop-blur-xl border border-violet-100"
+                className="p-6 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-blue-100 dark:border-slate-700"
               >
-                <stat.icon className="w-8 h-8 text-violet-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                <div className="text-sm text-slate-500">{stat.label}</div>
+                <stat.icon className="w-8 h-8 text-blue-600 dark:text-blue-400 mx-auto mb-2" />
+                <div className="text-3xl font-bold text-slate-900 dark:text-slate-100 mb-1">{stat.value}</div>
+                <div className="text-sm text-slate-500 dark:text-slate-400">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -317,7 +317,7 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1 }}
-            className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
+            className="absolute bottom-24 left-1/2 transform -translate-x-1/2"
           >
             <motion.div
               animate={{ y: [0, 10, 0] }}
@@ -359,10 +359,10 @@ export default function LandingPage() {
             <div
               className={`w-full h-full rounded-full opacity-5 blur-2xl ${
                 i % 3 === 0
-                  ? "bg-gradient-to-br from-violet-400 to-purple-500"
+                  ? "bg-gradient-to-br from-blue-400 to-indigo-500"
                   : i % 3 === 1
                   ? "bg-gradient-to-br from-cyan-400 to-blue-500"
-                  : "bg-gradient-to-br from-pink-400 to-rose-500"
+                  : "bg-gradient-to-br from-sky-400 to-cyan-500"
               }`}
             />
           </motion.div>
@@ -392,13 +392,13 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="p-6 rounded-2xl bg-white/70 backdrop-blur-xl border border-violet-100 hover:border-violet-300 transition-all group"
+                className="p-6 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-blue-100 dark:border-slate-700 hover:border-blue-300 dark:hover:border-blue-600 transition-all group"
               >
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">{feature.title}</h3>
-                <p className="text-slate-600">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">{feature.title}</h3>
+                <p className="text-slate-600 dark:text-slate-400">{feature.description}</p>
               </motion.div>
             ))}
           </div>
@@ -406,7 +406,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works Section */}
-      <section id="how-it-works" className="relative py-20 px-6 bg-white/50 overflow-hidden">
+      <section id="how-it-works" className="relative py-20 px-6 bg-white/50 dark:bg-slate-800/50 overflow-hidden">
         {/* Floating Background Shapes - Optimized */}
         {[...Array(3)].map((_, i) => (
           <motion.div
@@ -433,7 +433,7 @@ export default function LandingPage() {
             <div
               className={`w-full h-full rounded-full opacity-4 blur-2xl ${
                 i % 2 === 0
-                  ? "bg-gradient-to-br from-violet-400 to-purple-500"
+                  ? "bg-gradient-to-br from-blue-400 to-indigo-500"
                   : "bg-gradient-to-br from-cyan-400 to-blue-500"
               }`}
             />
@@ -447,10 +447,10 @@ export default function LandingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-slate-600 max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               Create professional charts in 4 simple steps
             </p>
           </motion.div>
@@ -466,17 +466,17 @@ export default function LandingPage() {
                 className="relative"
               >
                 {i < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-violet-200 to-transparent" />
+                  <div className="hidden lg:block absolute top-12 left-full w-full h-0.5 bg-gradient-to-r from-blue-200 dark:from-blue-700 to-transparent" />
                 )}
-                <div className="relative p-6 rounded-2xl bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-violet-100">
-                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                <div className="relative p-6 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-700/50 dark:to-slate-800/50 border-2 border-blue-100 dark:border-slate-600">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold text-lg shadow-lg">
                     {step.number}
                   </div>
                   <div className="mt-4 mb-4">
-                    <step.icon className="w-10 h-10 text-violet-600" />
+                    <step.icon className="w-10 h-10 text-blue-600 dark:text-blue-400" />
                   </div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-2">{step.title}</h3>
-                  <p className="text-slate-600">{step.description}</p>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">{step.title}</h3>
+                  <p className="text-slate-600 dark:text-slate-400">{step.description}</p>
                 </div>
               </motion.div>
             ))}
@@ -511,16 +511,16 @@ export default function LandingPage() {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
                 whileHover={{ y: -5 }}
-                className="p-6 rounded-2xl bg-white/70 backdrop-blur-xl border border-violet-100"
+                className="p-6 rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border border-blue-100 dark:border-slate-700"
               >
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, j) => (
                     <Star key={j} className="w-5 h-5 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-slate-700 mb-6 italic">"{testimonial.comment}"</p>
+                <p className="text-slate-700 dark:text-slate-300 mb-6 italic">"{testimonial.comment}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center text-2xl">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center text-2xl">
                     {testimonial.image}
                   </div>
                   <div>
@@ -537,7 +537,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-6 bg-gradient-to-br from-violet-600 to-purple-600">
+      <section className="py-20 px-6 bg-gradient-to-br from-blue-600 to-indigo-600">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -548,11 +548,11 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Ready to Create Amazing Charts?
             </h2>
-            <p className="text-xl text-violet-100 mb-8">
+            <p className="text-xl text-blue-100 mb-8">
               Join thousands of users creating beautiful data visualizations with AI
             </p>
             <Link href="/login">
-              <GradientButton size="lg" className="text-lg px-8 py-6 bg-white text-violet-600 hover:bg-violet-50">
+              <GradientButton size="lg" className="text-lg px-8 py-6 bg-white text-blue-600 hover:bg-blue-50">
                 Get Started Free
                 <ArrowRight className="w-5 h-5 ml-2" />
               </GradientButton>
@@ -567,7 +567,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
                   <BarChart3 className="w-6 h-6 text-white" />
                 </div>
                 <span className="font-bold text-xl text-white">Graphzy</span>
