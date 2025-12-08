@@ -176,7 +176,7 @@ export const aiApi = {
 // Profile API
 export const profileApi = {
   updateProfile: (data: { first_name?: string; last_name?: string }, token: string) =>
-    apiRequest<{ success: boolean; message: string; first_name?: string; last_name?: string }>("/profile/update", {
+    apiRequest<{ success: boolean; first_name?: string; last_name?: string }>("/profile/update", {
       method: "PUT",
       body: data,
       token,
