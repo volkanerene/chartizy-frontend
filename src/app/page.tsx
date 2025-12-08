@@ -146,7 +146,7 @@ export default function LandingPage() {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="rounded-full text-white dark:text-slate-300"
+              className="rounded-full bg-white dark:bg-transparent text-slate-900 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
               aria-label="Toggle theme"
             >
               {theme === "dark" ? (
@@ -156,7 +156,7 @@ export default function LandingPage() {
               )}
             </Button>
             <Link href="/login">
-              <Button variant="ghost" className="text-white dark:text-slate-300">Sign In</Button>
+              <Button variant="ghost" className="bg-white dark:bg-transparent text-slate-900 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Sign In</Button>
             </Link>
             <Link href="/login">
               <GradientButton>Get Started</GradientButton>
