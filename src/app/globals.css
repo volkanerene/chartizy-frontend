@@ -22,7 +22,7 @@
 }
 
 @theme inline {
-  --font-satoshi: 'Satoshi', system-ui, sans-serif;
+  --font-geist: 'Geist', system-ui, sans-serif;
   --color-background: oklch(0.99 0.002 286);
   --color-foreground: oklch(0.15 0.02 286);
 }
@@ -48,8 +48,8 @@
 
 /* Base body styles */
 body {
-  font-family: var(--font-satoshi), 'SF Pro Display', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  background: linear-gradient(135deg, #faf5ff 0%, #f0f9ff 50%, #f0fdf4 100%);
+  font-family: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  background: #ffffff;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

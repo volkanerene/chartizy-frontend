@@ -40,7 +40,7 @@ export default function TermsPage() {
                 1. Acceptance of Terms
               </h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                By accessing and using Graphzy ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+                By accessing and using Chartizy ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
               </p>
             </section>
 
@@ -49,7 +49,7 @@ export default function TermsPage() {
                 2. Description of Service
               </h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                Graphzy is an AI-powered chart and data visualization platform that allows users to create, customize, and export various types of charts and graphs. The Service includes:
+                Chartizy is an AI-powered chart and data visualization platform that allows users to create, customize, and export various types of charts and graphs. The Service includes:
               </p>
               <ul className="list-disc list-inside text-slate-600 dark:text-slate-300 space-y-2 ml-4">
                 <li>AI-powered chart generation from text descriptions</li>
@@ -81,7 +81,7 @@ export default function TermsPage() {
                 4. Subscription Plans
               </h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                Graphzy offers two subscription tiers:
+                Chartizy offers two subscription tiers:
               </p>
               <div className="bg-violet-50 dark:bg-slate-700/50 rounded-xl p-4 mb-4">
                 <h3 className="font-semibold text-slate-900 dark:text-slate-100 mb-2">Free Plan</h3>
@@ -122,7 +122,7 @@ export default function TermsPage() {
                 6. Intellectual Property
               </h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                The Service and its original content, features, and functionality are owned by Graphzy and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. You retain ownership of any data you upload, but grant Graphzy a license to use, store, and process such data to provide the Service.
+                The Service and its original content, features, and functionality are owned by Chartizy and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws. You retain ownership of any data you upload, but grant Chartizy a license to use, store, and process such data to provide the Service.
               </p>
             </section>
 
@@ -131,7 +131,7 @@ export default function TermsPage() {
                 7. Limitation of Liability
               </h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                Graphzy shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the Service.
+                Chartizy shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your use of the Service.
               </p>
             </section>
 
@@ -161,7 +161,7 @@ export default function TermsPage() {
                 If you have any questions about these Terms of Service, please contact us at:
               </p>
               <p className="text-slate-600 dark:text-slate-300 mt-2">
-                Email: support@graphzy.com
+                Email: support@chartizy.com
               </p>
             </section>
           </div>

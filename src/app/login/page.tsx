@@ -4,13 +4,14 @@ import { useState, useEffect, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight, ArrowLeft } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import Logo from "@/components/Logo";
 
 function LoginPageContent() {
   const searchParams = useSearchParams();
@@ -114,33 +115,24 @@ function LoginPageContent() {
   };
 
   return (
-    <main className="min-h-screen gradient-bg mesh-bg flex items-center justify-center p-4">
+    <main className="min-h-screen bg-white flex items-center justify-center p-4">
       {/* Back to Home Link */}
       <Link
         href="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-slate-600 hover:text-violet-600 transition-colors"
+        className="absolute top-6 left-6 flex items-center gap-2 text-slate-600 hover:text-blue-600 transition-colors"
       >
         <ArrowLeft className="w-5 h-5" />
         <span className="font-medium">Back to Home</span>
       </Link>
-      {/* Floating decorative elements */}
+      {/* Floating decorative elements - Optimized */}
       <motion.div
-        className="absolute top-20 left-20 w-72 h-72 bg-violet-300/30 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          x: [0, 30, 0],
-          y: [0, -20, 0],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-300/30 rounded-full blur-3xl"
+        className="absolute top-20 left-20 w-72 h-72 bg-blue-300/20 rounded-full blur-3xl pointer-events-none will-change-transform"
         animate={{
           scale: [1, 1.1, 1],
-          x: [0, -20, 0],
-          y: [0, 30, 0],
+          x: [0, 20, 0],
+          y: [0, -15, 0],
         }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
       />
 
       <motion.div
@@ -157,12 +149,11 @@ function LoginPageContent() {
           className="text-center mb-8"
         >
           <motion.div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-xl shadow-violet-500/30 mb-4"
-            whileHover={{ scale: 1.05, rotate: 5 }}
+            className="flex justify-center mb-4"
+            whileHover={{ scale: 1.05 }}
           >
-            <Sparkles className="w-8 h-8 text-white" />
+            <Logo size="md" />
           </motion.div>
-          <h1 className="text-3xl font-bold text-slate-900">Graphzy</h1>
           <p className="text-slate-500 mt-2">
             Create stunning charts with AI
           </p>
@@ -171,10 +162,10 @@ function LoginPageContent() {
         {/* Auth Card */}
         <motion.div
           layout
-          className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-violet-500/10 border-2 border-white/50 overflow-hidden"
+          className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-blue-500/10 border-2 border-white/50 overflow-hidden"
         >
           {/* Tab Switcher */}
-          <div className="flex border-b border-violet-100">
+          <div className="flex border-b border-blue-100">
             {["Login", "Sign Up"].map((tab, i) => (
               <button
                 key={tab}
@@ -186,7 +177,7 @@ function LoginPageContent() {
                 className={cn(
                   "flex-1 py-4 text-sm font-medium transition-all duration-300 relative",
                   (isLogin && i === 0) || (!isLogin && i === 1)
-                    ? "text-violet-600"
+                    ? "text-blue-600"
                     : "text-slate-400 hover:text-slate-600"
                 )}
               >
@@ -194,7 +185,7 @@ function LoginPageContent() {
                 {((isLogin && i === 0) || (!isLogin && i === 1)) && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-500 to-purple-500"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
                   />
                 )}
               </button>
@@ -307,16 +298,16 @@ function LoginPageContent() {
                   id="terms"
                   checked={acceptedTerms}
                   onChange={(e) => setAcceptedTerms(e.target.checked)}
-                  className="mt-1 w-4 h-4 rounded border-violet-300 text-violet-600 focus:ring-violet-500"
+                  className="mt-1 w-4 h-4 rounded border-blue-300 text-blue-600 focus:ring-blue-500"
                   required
                 />
-                <label htmlFor="terms" className="text-sm text-slate-600 dark:text-slate-300">
+                <label htmlFor="terms" className="text-sm text-slate-600">
                   I have read and agree to the{" "}
-                  <Link href="/terms" className="text-violet-600 hover:text-violet-700 underline">
+                  <Link href="/terms" className="text-blue-600 hover:text-blue-700 underline">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/privacy" className="text-violet-600 hover:text-violet-700 underline">
+                  <Link href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
                     Privacy Policy
                   </Link>
                 </label>
@@ -327,7 +318,7 @@ function LoginPageContent() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
                   Forgot password?
                 </button>
@@ -337,7 +328,7 @@ function LoginPageContent() {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base bg-blue-600 hover:bg-blue-700 text-white"
             >
               {isLoading ? (
                 <motion.div
@@ -368,7 +359,7 @@ function LoginPageContent() {
               type="button"
               variant="outline"
               onClick={handleGoogleSignIn}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base border-blue-300 text-blue-600 hover:bg-blue-50 hover:border-blue-400"
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
@@ -401,11 +392,11 @@ function LoginPageContent() {
           className="text-center text-sm text-slate-500 mt-6"
         >
           By continuing, you agree to our{" "}
-          <Link href="/terms" className="text-violet-600 hover:underline">
+          <Link href="/terms" className="text-blue-600 hover:underline">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="text-violet-600 hover:underline">
+          <Link href="/privacy" className="text-blue-600 hover:underline">
             Privacy Policy
           </Link>
         </motion.p>
@@ -417,9 +408,9 @@ function LoginPageContent() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50">
+      <main className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-slate-600">Loading...</p>
         </div>
       </main>

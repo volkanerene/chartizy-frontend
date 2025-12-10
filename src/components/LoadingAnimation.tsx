@@ -109,7 +109,7 @@ export function LoadingScreen({ text }: { text?: string }) {
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          {text || "Loading Graphzy..."}
+          {text || "Loading Chartizy..."}
         </motion.p>
       </motion.div>
     </div>

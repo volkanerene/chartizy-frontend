@@ -45,7 +45,7 @@ export function PricingModal({ isOpen, onClose, onUpgrade }: PricingModalProps) 
               Upgrade to Pro
             </DialogTitle>
             <DialogDescription className="text-violet-100">
-              Unlock the full power of Graphzy with unlimited charts and premium features.
+              Unlock the full power of Chartizy with unlimited charts and premium features.
             </DialogDescription>
           </DialogHeader>
         </div>

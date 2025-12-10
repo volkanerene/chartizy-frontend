@@ -40,7 +40,7 @@ export default function PrivacyPage() {
                 1. Introduction
               </h2>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                Graphzy ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. Please read this policy carefully to understand our practices regarding your data.
+                Chartizy ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service. Please read this policy carefully to understand our practices regarding your data.
               </p>
             </section>
 
@@ -197,7 +197,7 @@ export default function PrivacyPage() {
                 If you have any questions about this Privacy Policy, please contact us at:
               </p>
               <p className="text-slate-600 dark:text-slate-300 mt-2">
-                Email: privacy@graphzy.com
+                Email: privacy@chartizy.com
               </p>
             </section>
           </div>

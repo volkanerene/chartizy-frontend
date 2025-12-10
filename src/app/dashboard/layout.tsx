@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -44,6 +44,7 @@ export default function DashboardLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pricingOpen, setPricingOpen] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
+  const onboardingRedirectRef = useRef(false);
 
   // Wait for auth to initialize, then redirect if not authenticated
   useEffect(() => {
@@ -60,8 +61,9 @@ export default function DashboardLayout({
         return;
       }
 
-      // Check if user needs onboarding
-      if (session && user && (!user.first_name || !user.last_name)) {
+      // Check if user needs onboarding (only once, prevent loops)
+      if (session && user && (!user.first_name || !user.last_name) && !onboardingRedirectRef.current) {
+        onboardingRedirectRef.current = true;
         router.push("/onboarding");
         setAuthChecked(true);
         return;
@@ -109,7 +111,7 @@ export default function DashboardLayout({
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
               <BarChart3 className="w-4 h-4 text-white" />
             </div>
-            <span className="font-semibold text-slate-900 dark:text-slate-100">Graphzy</span>
+            <span className="font-semibold text-slate-900 dark:text-slate-100">Chartizy</span>
           </div>
         </div>
         <Avatar className="h-9 w-9">
@@ -142,7 +144,7 @@ export default function DashboardLayout({
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
                     <BarChart3 className="w-5 h-5 text-white" />
                   </div>
-                  <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Graphzy</span>
+                  <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Chartizy</span>
                 </div>
                 <button
                   onClick={() => setSidebarOpen(false)}
@@ -173,7 +175,7 @@ export default function DashboardLayout({
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-500/30">
               <BarChart3 className="w-5 h-5 text-white" />
             </div>
-            <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Graphzy</span>
+            <span className="font-bold text-xl text-slate-900 dark:text-slate-100">Chartizy</span>
           </div>
         </div>
         <SidebarContent
