@@ -109,6 +109,21 @@ export const chartsApi = {
   getById: (id: string, token: string) =>
     apiRequest<Chart>(`/chart/${id}`, { token }),
 
+  update: (
+    id: string,
+    data: {
+      result_visual?: string;
+      result_code?: string;
+      title?: string;
+    },
+    token: string
+  ) =>
+    apiRequest<{ success: boolean; message: string; chart: Chart }>(`/chart/${id}`, {
+      method: "PUT",
+      body: data,
+      token,
+    }),
+
   delete: (id: string, token: string) =>
     apiRequest<{ success: boolean; message: string }>(`/chart/${id}`, {
       method: "DELETE",

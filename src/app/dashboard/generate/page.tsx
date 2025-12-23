@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ChartPreview } from "@/components/ChartPreview";
+import { InteractiveChart } from "@/components/InteractiveChart";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
 import { cn } from "@/lib/utils";
 
@@ -442,207 +443,193 @@ export default function GeneratePage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-8"
           >
-            {/* Mode Selector */}
-            <div className="flex flex-wrap gap-3 justify-center">
-              {[
-                { mode: "ai" as InputMode, icon: Sparkles, label: "AI Text Input", desc: "Describe your data" },
-                { mode: "manual" as InputMode, icon: Table2, label: "Manual Entry", desc: "Enter data directly" },
-                { mode: "file" as InputMode, icon: FileSpreadsheet, label: "Upload File", desc: "CSV or Excel" },
-              ].map(({ mode, icon: Icon, label, desc }) => (
-                <motion.button
-                  key={mode}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => setInputMode(mode)}
-                  className={cn(
-                    "flex items-center gap-4 p-5 rounded-2xl border-2 transition-all min-w-[200px]",
-                    inputMode === mode
-                      ? "border-violet-500 bg-violet-50 shadow-lg shadow-violet-500/20"
-                      : "border-violet-100 bg-white/70 hover:border-violet-200"
-                  )}
-                >
-                  <div className={cn(
-                    "p-3 rounded-xl",
-                    inputMode === mode ? "bg-violet-500 text-white" : "bg-violet-100 text-violet-600"
-                  )}>
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold text-slate-900">{label}</div>
-                    <div className="text-sm text-slate-500">{desc}</div>
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-
-            {/* Input Area */}
-            <AnimatePresence mode="wait">
-              {inputMode === "ai" && (
-                <motion.div
-                  key="ai"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-4"
-                >
-                  <Card className="p-6 bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="p-2 rounded-lg bg-violet-500 text-white">
-                        <Wand2 className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-slate-900">AI-Powered Data Input</h3>
-                        <p className="text-sm text-slate-500">Describe your data naturally, we&apos;ll do the rest</p>
-                      </div>
-                    </div>
-
+            {/* AI Input Mode */}
+            {inputMode === "ai" && (
+              <motion.div
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="relative mb-12">
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-r from-[#165DFC]/20 to-[#8EC6FF]/20 rounded-3xl blur-2xl"
+                    animate={{
+                      scale: [1, 1.05, 1],
+                      opacity: [0.5, 0.7, 0.5],
+                    }}
+                    transition={{
+                      duration: 3,
+                      repeat: Infinity,
+                    }}
+                  />
+                  <div className="relative bg-white/50 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden">
                     <textarea
                       value={aiPrompt}
                       onChange={(e) => setAiPrompt(e.target.value)}
-                      placeholder="e.g., Monthly sales: January 12,000, February 15,000, March 18,000..."
-                      className="w-full h-32 p-4 rounded-xl border-2 border-violet-200 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 bg-white/80 text-slate-900 placeholder:text-slate-400 resize-none transition-all"
+                      placeholder="Describe your data visualization... (e.g., Create a bar chart showing monthly sales for Q1 2024)"
+                      className="w-full h-48 px-8 py-6 bg-transparent text-xl font-medium text-gray-800 placeholder-gray-400 focus:outline-none resize-none"
                     />
-
-                    <div className="mt-4">
-                      <p className="text-xs text-slate-500 mb-2 flex items-center gap-1">
-                        <Lightbulb className="w-3 h-3" /> Try these examples:
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {promptExamples.map((example, i) => (
-                          <button
-                            key={i}
-                            onClick={() => setAiPrompt(example)}
-                            className="px-3 py-1.5 text-xs bg-white/80 border border-violet-200 rounded-lg hover:bg-violet-50 text-slate-600 transition-colors"
-                          >
-                            {example.slice(0, 40)}...
-                          </button>
-                        ))}
-                      </div>
+                    <div className="px-8 pb-6 flex justify-between items-center">
+                      <span className="text-sm text-gray-400">
+                        {aiPrompt.length} characters
+                      </span>
+                      <motion.button
+                        onClick={() => parseAIPrompt(aiPrompt)}
+                        disabled={!aiPrompt.trim() || isAnalyzing}
+                        className={`px-8 py-4 rounded-full font-bold text-white ${
+                          aiPrompt.trim() && !isAnalyzing
+                            ? "bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] shadow-xl"
+                            : "bg-gray-300 cursor-not-allowed"
+                        }`}
+                        whileHover={
+                          aiPrompt.trim() && !isAnalyzing
+                            ? { scale: 1.05, y: -2 }
+                            : {}
+                        }
+                        whileTap={
+                          aiPrompt.trim() && !isAnalyzing ? { scale: 0.95 } : {}
+                        }
+                      >
+                        {isAnalyzing ? (
+                          <div className="flex items-center gap-2">
+                            <motion.div
+                              className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                              animate={{ rotate: 360 }}
+                              transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                ease: "linear",
+                              }}
+                            />
+                            Generating
+                          </div>
+                        ) : (
+                          "Generate Chart"
+                        )}
+                      </motion.button>
                     </div>
-                  </Card>
+                  </div>
+                </div>
 
-                  <Button
-                    onClick={() => parseAIPrompt(aiPrompt)}
-                    disabled={!aiPrompt.trim() || isAnalyzing}
-                    className="w-full h-14 text-lg"
-                  >
-                    {isAnalyzing ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="w-5 h-5 mr-2" />
-                        Analyze & Suggest Charts
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
-              )}
+                {/* Examples */}
+                <div>
+                  <p className="text-sm text-gray-400 mb-4 text-center">
+                    Or try these:
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    {promptExamples.map((example, index) => (
+                      <motion.button
+                        key={index}
+                        onClick={() => setAiPrompt(example)}
+                        className="text-left p-6 bg-white/40 backdrop-blur-xl rounded-2xl border border-white/20 hover:border-[#165DFC] transition-all"
+                        whileHover={{ scale: 1.03, y: -4 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 * index }}
+                      >
+                        <p className="text-sm text-gray-700">{example}</p>
+                      </motion.button>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-              {inputMode === "manual" && (
-                <motion.div
-                  key="manual"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-4"
-                >
-                  <Card className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="font-semibold text-slate-900">Enter Your Data</h3>
-                      <Button variant="outline" size="sm" onClick={addRow}>
-                        <Plus className="w-4 h-4 mr-1" /> Add Row
-                      </Button>
+            {/* Manual Mode */}
+            {inputMode === "manual" && (
+              <motion.div
+                className="bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-xl"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <h3 className="text-2xl font-bold mb-6">Manual Data Entry</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="font-semibold text-gray-900">Enter Your Data</h4>
+                    <motion.button
+                      onClick={addRow}
+                      className="px-4 py-2 bg-white/70 rounded-full font-semibold text-sm"
+                      whileHover={{ scale: 1.05 }}
+                    >
+                      Add Row
+                    </motion.button>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-[1fr,120px,40px] gap-3 text-sm font-medium text-gray-500">
+                      <span>Label</span>
+                      <span>Value</span>
+                      <span></span>
                     </div>
-
-                    <div className="space-y-3">
-                      <div className="grid grid-cols-[1fr,120px,40px] gap-3 text-sm font-medium text-slate-500">
-                        <span>Label</span>
-                        <span>Value</span>
-                        <span></span>
-                      </div>
-                      {dataRows.map((row, i) => (
-                        <motion.div
-                          key={row.id}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          className="grid grid-cols-[1fr,120px,40px] gap-3"
+                    {dataRows.map((row, i) => (
+                      <motion.div
+                        key={row.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="grid grid-cols-[1fr,120px,40px] gap-3"
+                      >
+                        <input
+                          value={row.label}
+                          onChange={(e) => updateRow(row.id, "label", e.target.value)}
+                          placeholder="Label"
+                          className="px-4 py-2 bg-white/70 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#165DFC]"
+                        />
+                        <input
+                          value={row.value}
+                          onChange={(e) => updateRow(row.id, "value", e.target.value)}
+                          placeholder="0"
+                          type="number"
+                          className="px-4 py-2 bg-white/70 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#165DFC]"
+                        />
+                        <button
+                          onClick={() => removeRow(row.id)}
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
                         >
-                          <Input
-                            value={row.label}
-                            onChange={(e) => updateRow(row.id, "label", e.target.value)}
-                            placeholder="Label"
-                          />
-                          <Input
-                            value={row.value}
-                            onChange={(e) => updateRow(row.id, "value", e.target.value)}
-                            placeholder="0"
-                            type="number"
-                          />
-                          <button
-                            onClick={() => removeRow(row.id)}
-                            className="p-2 text-slate-400 hover:text-red-500 transition-colors"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                        </motion.div>
-                      ))}
-                    </div>
-                  </Card>
-
-                  <Button onClick={handleManualSubmit} disabled={isAnalyzing} className="w-full h-14 text-lg">
-                    {isAnalyzing ? (
-                      <>
-                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                        Analyzing...
-                      </>
-                    ) : (
-                      <>
-                        <ArrowRight className="w-5 h-5 mr-2" />
-                        Continue to Chart Selection
-                      </>
-                    )}
-                  </Button>
-                </motion.div>
-              )}
-
-              {inputMode === "file" && (
-                <motion.div
-                  key="file"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className="space-y-4"
-                >
-                  <Card
-                    className="p-8 border-2 border-dashed border-violet-200 hover:border-violet-400 transition-colors cursor-pointer"
-                    onClick={() => fileInputRef.current?.click()}
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <motion.button
+                    onClick={handleManualSubmit}
+                    disabled={isAnalyzing}
+                    className="w-full px-8 py-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white rounded-full font-bold shadow-xl"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept=".csv,.txt,.xlsx,.xls"
-                      onChange={handleFileUpload}
-                      className="hidden"
-                    />
-                    <div className="text-center">
-                      <div className="mx-auto w-16 h-16 rounded-2xl bg-violet-100 flex items-center justify-center mb-4">
-                        <Upload className="w-8 h-8 text-violet-600" />
-                      </div>
-                      <h3 className="font-semibold text-slate-900 mb-2">
-                        Drop your file here or click to browse
-                      </h3>
-                      <p className="text-sm text-slate-500">
-                        Supports CSV, TXT, Excel files (2 columns: Label, Value)
-                      </p>
-                    </div>
-                  </Card>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                    {isAnalyzing ? "Analyzing..." : "Continue to Chart Selection"}
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* File Upload Mode */}
+            {inputMode === "file" && (
+              <motion.div
+                className="bg-white/50 backdrop-blur-xl rounded-3xl p-12 border-2 border-dashed border-gray-300 text-center"
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".csv,.txt,.xlsx,.xls"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+                <h3 className="text-2xl font-bold mb-4">Upload File</h3>
+                <p className="text-gray-600 mb-6">
+                  Drag and drop CSV, Excel, or JSON files
+                </p>
+                <motion.button
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-8 py-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white rounded-full font-bold shadow-xl"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  Choose File
+                </motion.button>
+              </motion.div>
+            )}
 
             {error && (
               <motion.div
@@ -663,38 +650,39 @@ export default function GeneratePage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <button
+            <motion.button
               onClick={() => setStep("input")}
-              className="flex items-center gap-2 text-slate-500 hover:text-violet-600 transition-colors"
+              className="flex items-center gap-2 text-gray-500 hover:text-[#165DFC] transition-colors"
+              whileHover={{ x: -5 }}
             >
               <ChevronLeft className="w-5 h-5" />
               Back to data input
-            </button>
+            </motion.button>
 
             {/* AI Interpretation */}
             {aiGenerated && aiInterpretation && (
-              <Card className="p-4 bg-gradient-to-r from-violet-500 to-purple-500 text-white">
+              <div className="p-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white rounded-2xl">
                 <div className="flex items-start gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
                     <Sparkles className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="font-semibold mb-1">🤖 AI Analysis</h4>
+                    <h4 className="font-semibold mb-1">AI Analysis</h4>
                     <p className="text-sm text-white/90">{aiInterpretation}</p>
                   </div>
                 </div>
-              </Card>
+              </div>
             )}
 
             {/* Data Preview */}
-            <Card className="p-6 bg-gradient-to-br from-slate-50 to-violet-50/50">
+            <div className="p-6 bg-white/50 backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-slate-900">
+                <h3 className="font-semibold text-gray-900">
                   {chartTitle || "Your Data"}
                 </h3>
                 {aiGenerated && (
-                  <span className="px-2 py-1 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">
-                    ✨ AI Generated
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                    AI Generated
                   </span>
                 )}
               </div>
@@ -702,19 +690,19 @@ export default function GeneratePage() {
                 {parsedData?.labels.map((label, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1.5 bg-white rounded-lg border border-violet-200 text-sm"
+                    className="px-3 py-1.5 bg-white/70 rounded-lg border border-gray-200 text-sm"
                   >
-                    <span className="font-medium text-slate-900">{label}:</span>{" "}
-                    <span className="text-violet-600">{parsedData.values[i]?.toLocaleString()}</span>
+                    <span className="font-medium text-gray-900">{label}:</span>{" "}
+                    <span className="text-[#165DFC]">{parsedData.values[i]?.toLocaleString()}</span>
                   </span>
                 ))}
               </div>
-            </Card>
+            </div>
 
             {/* Chart Suggestions */}
             <div>
-              <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-violet-500" />
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#165DFC]" />
                 Recommended Charts
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -725,15 +713,15 @@ export default function GeneratePage() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1 }}
                   >
-                    <Card
+                    <div
                       className={cn(
-                        "p-4 cursor-pointer transition-all hover:shadow-lg hover:border-violet-300",
-                        i === 0 && "ring-2 ring-violet-500 ring-offset-2"
+                        "p-4 cursor-pointer transition-all hover:shadow-lg hover:border-[#165DFC] bg-white/50 backdrop-blur-xl rounded-2xl border border-white/20",
+                        i === 0 && "ring-2 ring-[#165DFC] ring-offset-2"
                       )}
                       onClick={() => handleSelectChart(suggestion)}
                     >
                       <div className="flex items-start gap-4">
-                        <div className="w-24 h-20 rounded-lg bg-gradient-to-br from-violet-100 to-purple-100 overflow-hidden">
+                        <div className="w-24 h-20 rounded-lg bg-gradient-to-br from-blue-100 to-blue-200 overflow-hidden">
                           <ChartPreview
                             chartType={suggestion.template.chart_type}
                             exampleData={suggestion.template.example_data}
@@ -742,30 +730,30 @@ export default function GeneratePage() {
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="font-semibold text-slate-900">
+                            <h4 className="font-semibold text-gray-900">
                               {suggestion.template.name}
                             </h4>
                             {i === 0 && (
-                              <span className="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-full">
+                              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
                                 Best Match
                               </span>
                             )}
                           </div>
-                          <p className="text-sm text-slate-500 mt-1">{suggestion.reason}</p>
+                          <p className="text-sm text-gray-500 mt-1">{suggestion.reason}</p>
                           <div className="flex items-center gap-2 mt-2">
-                            <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                            <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
                               <div
-                                className="h-full bg-gradient-to-r from-violet-500 to-purple-500 rounded-full"
+                                className="h-full bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] rounded-full"
                                 style={{ width: `${suggestion.confidence}%` }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-slate-500">
+                            <span className="text-xs font-medium text-gray-500">
                               {suggestion.confidence}% match
                             </span>
                           </div>
                         </div>
                       </div>
-                    </Card>
+                    </div>
                   </motion.div>
                 ))}
               </div>
@@ -780,56 +768,104 @@ export default function GeneratePage() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <button
+            <motion.button
               onClick={() => setStep("select")}
-              className="flex items-center gap-2 text-slate-500 hover:text-violet-600 transition-colors"
+              className="flex items-center gap-2 text-gray-500 hover:text-[#165DFC] transition-colors"
+              whileHover={{ x: -5 }}
             >
               <ChevronLeft className="w-5 h-5" />
               Back to chart selection
-            </button>
+            </motion.button>
 
             {/* Preview */}
-            <Card className="p-6">
-              <h3 className="font-semibold text-slate-900 mb-4">Preview</h3>
-              <div className="h-64 rounded-xl bg-gradient-to-br from-violet-50 to-purple-50 p-4">
-                <ChartPreview
-                  chartType={selectedTemplate?.chart_type || "bar"}
-                  exampleData={selectedTemplate?.example_data}
-                  height={240}
-                  interactive
-                />
+            <div className="p-6 bg-white/50 backdrop-blur-xl rounded-3xl border border-white/20 shadow-xl">
+              <h3 className="font-semibold text-gray-900 mb-4">Preview</h3>
+              <div className="h-64 rounded-xl bg-white p-4">
+                {selectedTemplate && parsedData ? (
+                  <InteractiveChart
+                    chartConfig={{
+                      type: selectedTemplate.chart_type,
+                      data: {
+                        labels: parsedData.labels,
+                        datasets: [{
+                          label: "Data",
+                          data: parsedData.values,
+                          backgroundColor: selectedTemplate.chart_type === "pie" || selectedTemplate.chart_type === "doughnut"
+                            ? [
+                                "rgba(22, 93, 252, 0.8)",
+                                "rgba(74, 125, 253, 0.8)",
+                                "rgba(107, 157, 254, 0.8)",
+                                "rgba(142, 198, 255, 0.8)",
+                                "rgba(175, 220, 255, 0.8)",
+                              ]
+                            : "rgba(22, 93, 252, 0.8)",
+                          borderColor: "rgba(22, 93, 252, 1)",
+                        }],
+                      },
+                      options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                      },
+                    }}
+                    height={240}
+                    showPercentChange={false}
+                    animated={true}
+                    theme="light"
+                  />
+                ) : (
+                  <ChartPreview
+                    chartType={selectedTemplate?.chart_type || "bar"}
+                    exampleData={selectedTemplate?.example_data}
+                    height={240}
+                    interactive
+                  />
+                )}
               </div>
-            </Card>
+            </div>
 
             {/* Selected Template Info */}
-            <Card className="p-4">
+            <div className="p-4 bg-white/50 backdrop-blur-xl rounded-2xl border border-white/20">
               <div className="flex items-center gap-4">
                 <CheckCircle className="w-6 h-6 text-green-500" />
                 <div>
-                  <h4 className="font-semibold text-slate-900">{selectedTemplate?.name}</h4>
-                  <p className="text-sm text-slate-500">{selectedTemplate?.description}</p>
+                  <h4 className="font-semibold text-gray-900">{selectedTemplate?.name}</h4>
+                  <p className="text-sm text-gray-500">{selectedTemplate?.description}</p>
                 </div>
               </div>
-            </Card>
+            </div>
 
             {/* Generate Button */}
-            <Button
+            <motion.button
               onClick={handleGenerate}
               disabled={isGenerating || !canGenerate}
-              className="w-full h-14 text-lg"
+              className={`w-full px-8 py-4 rounded-full font-bold text-white ${
+                !isGenerating && canGenerate
+                  ? "bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] shadow-xl"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+              whileHover={!isGenerating && canGenerate ? { scale: 1.02 } : {}}
+              whileTap={!isGenerating && canGenerate ? { scale: 0.98 } : {}}
             >
               {isGenerating ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                <div className="flex items-center justify-center gap-2">
+                  <motion.div
+                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{
+                      duration: 1,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                  />
                   Generating with AI...
-                </>
+                </div>
               ) : (
                 <>
-                  <Sparkles className="w-5 h-5 mr-2" />
+                  <Sparkles className="w-5 h-5 inline mr-2" />
                   Generate Chart
                 </>
               )}
-            </Button>
+            </motion.button>
 
             {!canGenerate && (
               <p className="text-center text-sm text-amber-600">
@@ -850,55 +886,59 @@ export default function GeneratePage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-8"
-      >
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-100 text-violet-700 text-sm font-medium mb-4">
-          <Sparkles className="w-4 h-4" />
-          AI-Powered Chart Generation
-        </div>
-        <h1 className="text-3xl font-bold text-slate-900 mb-2">Create Your Chart</h1>
-        <p className="text-slate-500">
-          Describe your data, upload a file, or enter values manually
-        </p>
-      </motion.div>
+    <motion.div
+      className="min-h-screen px-8"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <motion.div
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          <h1 className="text-7xl font-black mb-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent">
+            Generate
+          </h1>
+          <p className="text-gray-500 text-xl">
+            Describe your vision, watch it materialize
+          </p>
+        </motion.div>
 
-      {/* Progress Indicator */}
-      <div className="flex items-center justify-center gap-4 mb-8">
-        {["Input Data", "Select Chart", "Generate"].map((label, i) => {
-          const stepIndex = ["input", "select", "customize"].indexOf(step);
-          const isActive = i === stepIndex;
-          const isComplete = i < stepIndex;
+        {/* Mode Selection */}
+        <motion.div
+          className="flex gap-4 mb-12 justify-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          {[
+            { id: "ai", label: "AI Text" },
+            { id: "manual", label: "Manual Entry" },
+            { id: "file", label: "File Upload" },
+          ].map((m) => (
+            <motion.button
+              key={m.id}
+              onClick={() => setInputMode(m.id as InputMode)}
+              className={`px-8 py-4 rounded-full font-bold transition-all ${
+                inputMode === m.id
+                  ? "bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white shadow-xl"
+                  : "bg-white/50 backdrop-blur-xl text-gray-700 border border-white/20"
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {m.label}
+            </motion.button>
+          ))}
+        </motion.div>
 
-          return (
-            <div key={label} className="flex items-center gap-2">
-              <div
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-all",
-                  isComplete
-                    ? "bg-green-500 text-white"
-                    : isActive
-                    ? "bg-violet-500 text-white"
-                    : "bg-slate-200 text-slate-500"
-                )}
-              >
-                {isComplete ? <CheckCircle className="w-5 h-5" /> : i + 1}
-              </div>
-              <span className={cn("text-sm hidden sm:block", isActive ? "text-slate-900 font-medium" : "text-slate-500")}>
-                {label}
-              </span>
-              {i < 2 && <div className="w-8 h-0.5 bg-slate-200" />}
-            </div>
-          );
-        })}
+        {/* Content */}
+        {renderStep()}
       </div>
-
-      {/* Content */}
-      {renderStep()}
-    </div>
+    </motion.div>
   );
 }

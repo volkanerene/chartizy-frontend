@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Lock, ArrowRight, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ChartPreview } from "./ChartPreview";
+import { InteractiveChart } from "./InteractiveChart";
 import type { Template } from "@/lib/api";
 
 interface TemplateCardProps {
@@ -83,8 +83,7 @@ export function TemplateCard({
       {/* Premium Badge */}
       {template.is_premium && (
         <div className="absolute top-3 right-3 z-20">
-          <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold shadow-lg">
-            <Star className="w-3 h-3 fill-current" />
+          <div className="px-2 py-1 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-semibold shadow-lg">
             PRO
           </div>
         </div>
@@ -105,13 +104,23 @@ export function TemplateCard({
           }} />
         </div>
 
-        {/* Actual Chart Preview */}
+        {/* Actual Chart Preview - Use real chart if example_data has chart config */}
         <div className="relative w-full h-full p-3">
-          <ChartPreview
-            chartType={template.chart_type}
-            exampleData={template.example_data}
-            height={120}
-          />
+          {template.example_data && typeof template.example_data === 'object' && 'type' in template.example_data ? (
+            <InteractiveChart
+              chartConfig={template.example_data as any}
+              height={120}
+              showPercentChange={false}
+              animated={false}
+              theme="light"
+            />
+          ) : (
+            <ChartPreview
+              chartType={template.chart_type}
+              exampleData={template.example_data}
+              height={120}
+            />
+          )}
         </div>
 
         {/* Lock overlay */}
@@ -121,17 +130,17 @@ export function TemplateCard({
             animate={{ opacity: 1 }}
             className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center"
           >
-            <div className="bg-white/90 rounded-full p-3">
-              <Lock className="w-6 h-6 text-slate-600" />
+            <div className="bg-white/90 rounded-full p-3 text-slate-600 text-sm font-semibold">
+              Locked
             </div>
           </motion.div>
         )}
 
         {/* Hover Overlay */}
         {!isLocked && (
-          <div className="absolute inset-0 bg-gradient-to-t from-violet-600/80 via-violet-600/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
-            <span className="text-white text-sm font-medium flex items-center gap-1">
-              Use Template <ArrowRight className="w-4 h-4" />
+          <div className="absolute inset-0 bg-gradient-to-t from-blue-600/80 via-blue-600/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center pb-4">
+            <span className="text-white text-sm font-medium">
+              Use Template →
             </span>
           </div>
         )}
@@ -139,8 +148,7 @@ export function TemplateCard({
 
       {/* Content */}
       <div className="p-4">
-        <div className="flex items-start gap-3">
-          <span className="text-2xl">{emoji}</span>
+        <div className="flex items-start">
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-slate-900 text-sm truncate">
               {template.name}
@@ -153,11 +161,11 @@ export function TemplateCard({
 
         {/* Chart Type Badge */}
         <div className="mt-3 flex items-center gap-2">
-          <span className="px-2 py-1 bg-violet-100 text-violet-700 text-xs font-medium rounded-lg capitalize">
+          <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-lg capitalize">
             {template.chart_type.replace("-", " ")}
           </span>
           {!isLocked && (
-            <span className="text-xs text-slate-400 group-hover:text-violet-500 transition-colors">
+            <span className="text-xs text-slate-400 group-hover:text-blue-500 transition-colors">
               Click to use →
             </span>
           )}

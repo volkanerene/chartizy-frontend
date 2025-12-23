@@ -119,7 +119,7 @@ export function useAuth() {
             first_name: null,
             last_name: null,
           });
-          router.push("/onboarding");
+          router.push("/dashboard");
         }
       }
     },
@@ -152,14 +152,10 @@ export function useAuth() {
             last_name: userData.last_name,
           });
           
-          // Check if user has completed onboarding (has first_name and last_name)
-          if (!userData.first_name || !userData.last_name) {
-            router.push("/onboarding");
-          } else {
-            router.push("/dashboard");
-          }
+          // Redirect to dashboard
+          router.push("/dashboard");
         } catch {
-          // If API call fails, set user with null names and go to onboarding
+          // If API call fails, set user with null names and go to dashboard
           setUser({
             id: data.user?.id || "",
             email: data.user?.email || "",
@@ -168,7 +164,7 @@ export function useAuth() {
             first_name: null,
             last_name: null,
           });
-          router.push("/onboarding");
+          router.push("/dashboard");
         }
       } else {
         // Email confirmation required

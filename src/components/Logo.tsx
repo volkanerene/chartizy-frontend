@@ -3,9 +3,10 @@ import Image from "next/image";
 interface LogoProps {
   size?: "sm" | "md" | "lg";
   className?: string;
+  variant?: "default" | "black" | "white";
 }
 
-export default function Logo({ size = "md", className }: LogoProps) {
+export default function Logo({ size = "md", className, variant = "default" }: LogoProps) {
   const sizes = {
     sm: {
       width: 120,
@@ -22,11 +23,16 @@ export default function Logo({ size = "md", className }: LogoProps) {
   };
 
   const sizeConfig = sizes[size];
+  
+  // Determine which logo to use based on variant
+  // default = logo.png (for landing page)
+  // black = logoblack.png (for login, dashboard)
+  const logoSrc = variant === "default" ? "/logo.png" : "/logoblack.png";
 
   return (
     <div className={`flex items-center ${className || ""}`}>
       <Image
-        src="/logo.png"
+        src={logoSrc}
         alt="Chartizy"
         width={sizeConfig.width}
         height={sizeConfig.height}
@@ -36,3 +42,8 @@ export default function Logo({ size = "md", className }: LogoProps) {
     </div>
   );
 }
+
+
+
+
+

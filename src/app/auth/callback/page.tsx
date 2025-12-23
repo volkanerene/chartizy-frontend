@@ -118,12 +118,8 @@ function AuthCallbackContent() {
           last_name: userData.last_name,
         });
         
-        // Check if user needs onboarding
-        if (!userData.first_name || !userData.last_name) {
-          router.replace("/onboarding");
-        } else {
-          router.replace("/dashboard");
-        }
+        // Redirect to dashboard
+        router.replace("/dashboard");
       } catch (apiError) {
         console.error("API error fetching user data:", apiError);
         // Fallback to Supabase user data
@@ -136,7 +132,7 @@ function AuthCallbackContent() {
             first_name: null,
             last_name: null,
           });
-          router.replace("/onboarding");
+          router.replace("/dashboard");
         } else {
           router.replace("/login?error=user_data_error");
         }
