@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Plus, BarChart3, TrendingUp, Clock, Sparkles } from "lucide-react";
+import { Plus, BarChart3, TrendingUp, Clock, Sparkles, Wand2 } from "lucide-react";
 import { useStore } from "@/store/useStore";
-import { chartsApi, paymentApi } from "@/lib/api";
+import { chartsApi, paymentApi, templatesApi } from "@/lib/api";
 import { ChartCard } from "@/components/ChartCard";
 import { GradientButton } from "@/components/GradientButton";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
@@ -17,6 +17,8 @@ export default function DashboardPage() {
   const searchParams = useSearchParams();
   const { user, token, userCharts, setUserCharts, chartQuota, setUser } = useStore();
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPreviews, setIsGeneratingPreviews] = useState(false);
+  const [previewGenerationResult, setPreviewGenerationResult] = useState<any>(null);
   
   // Handle PayTR payment callback
   useEffect(() => {
@@ -63,6 +65,28 @@ export default function DashboardPage() {
   }, [user?.id, token, setUserCharts]);
 
   const isPro = user?.subscription_tier === "pro";
+
+  const handleGeneratePreviews = async () => {
+    if (!token) {
+      alert("Please log in to generate previews");
+      return;
+    }
+
+    setIsGeneratingPreviews(true);
+    setPreviewGenerationResult(null);
+
+    try {
+      const result = await templatesApi.generatePreviews(token);
+      setPreviewGenerationResult(result);
+      alert(`Preview generation complete!\nProcessed: ${result.processed}\nSkipped: ${result.skipped}\nFailed: ${result.failed}`);
+    } catch (error) {
+      console.error("Failed to generate previews:", error);
+      alert("Failed to generate previews. Please try again.");
+    } finally {
+      setIsGeneratingPreviews(false);
+    }
+  };
+
   const stats = [
     {
       label: "Total Charts",
@@ -96,7 +120,7 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
       >
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100">
             Welcome back{user?.email ? `, ${user.email.split("@")[0]}` : ""}!
           </h1>

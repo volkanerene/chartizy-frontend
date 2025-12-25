@@ -89,8 +89,8 @@ export default function TemplatesPage() {
       return;
     }
 
-    setSelectedTemplate(template);
-    router.push("/dashboard/generate");
+    // Navigate to template detail page instead of generate
+    router.push(`/dashboard/templates/${template.id}`);
   };
 
   return (

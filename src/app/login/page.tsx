@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
+import { BlobBackground } from "@/components/BlobBackground";
+import Logo from "@/components/Logo";
 
 function LoginPageContent() {
   const searchParams = useSearchParams();
@@ -24,8 +26,21 @@ function LoginPageContent() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   const { signIn, signUp } = useAuth();
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth - 0.5) * 20,
+        y: (e.clientY / window.innerHeight - 0.5) * 20,
+      });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
   
   // Check for OAuth error
   useEffect(() => {
@@ -114,34 +129,41 @@ function LoginPageContent() {
   };
 
   return (
-    <main className="min-h-screen gradient-bg mesh-bg flex items-center justify-center p-4">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 overflow-hidden relative flex items-center justify-center p-4">
+      {/* Parallax Background */}
+      <motion.div
+        className="fixed inset-0 z-0"
+        animate={{
+          x: mousePosition.x,
+          y: mousePosition.y,
+        }}
+        transition={{ type: "spring", stiffness: 50, damping: 20 }}
+      >
+        <BlobBackground />
+      </motion.div>
+
+      {/* Cursor Glow */}
+      <motion.div
+        className="fixed w-96 h-96 rounded-full pointer-events-none z-50 mix-blend-screen"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(22, 93, 252, 0.15) 0%, transparent 70%)",
+        }}
+        animate={{
+          x: mousePosition.x * 2,
+          y: mousePosition.y * 2,
+        }}
+        transition={{ type: "spring", stiffness: 100, damping: 30 }}
+      />
+
       {/* Back to Home Link */}
       <Link
         href="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-slate-600 hover:text-violet-600 transition-colors"
+        className="absolute top-6 left-6 z-50 flex items-center gap-2 text-gray-700 hover:text-[#165DFC] transition-colors font-semibold"
       >
         <ArrowLeft className="w-5 h-5" />
-        <span className="font-medium">Back to Home</span>
+        <span>Back to Home</span>
       </Link>
-      {/* Floating decorative elements */}
-      <motion.div
-        className="absolute top-20 left-20 w-72 h-72 bg-violet-300/30 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.2, 1],
-          x: [0, 30, 0],
-          y: [0, -20, 0],
-        }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute bottom-20 right-20 w-96 h-96 bg-cyan-300/30 rounded-full blur-3xl"
-        animate={{
-          scale: [1, 1.1, 1],
-          x: [0, -20, 0],
-          y: [0, 30, 0],
-        }}
-        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -157,13 +179,12 @@ function LoginPageContent() {
           className="text-center mb-8"
         >
           <motion.div
-            className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-xl shadow-violet-500/30 mb-4"
-            whileHover={{ scale: 1.05, rotate: 5 }}
+            className="flex justify-center mb-4"
+            whileHover={{ scale: 1.05 }}
           >
-            <Sparkles className="w-8 h-8 text-white" />
+            <Logo size="md" />
           </motion.div>
-          <h1 className="text-3xl font-bold text-slate-900">Graphzy</h1>
-          <p className="text-slate-500 mt-2">
+          <p className="text-gray-500 mt-2">
             Create stunning charts with AI
           </p>
         </motion.div>
@@ -171,10 +192,10 @@ function LoginPageContent() {
         {/* Auth Card */}
         <motion.div
           layout
-          className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl shadow-violet-500/10 border-2 border-white/50 overflow-hidden"
+          className="bg-white/50 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden"
         >
           {/* Tab Switcher */}
-          <div className="flex border-b border-violet-100">
+          <div className="flex border-b border-gray-200">
             {["Login", "Sign Up"].map((tab, i) => (
               <button
                 key={tab}
@@ -186,15 +207,15 @@ function LoginPageContent() {
                 className={cn(
                   "flex-1 py-4 text-sm font-medium transition-all duration-300 relative",
                   (isLogin && i === 0) || (!isLogin && i === 1)
-                    ? "text-violet-600"
-                    : "text-slate-400 hover:text-slate-600"
+                    ? "text-[#165DFC]"
+                    : "text-gray-400 hover:text-gray-600"
                 )}
               >
                 {tab}
                 {((isLogin && i === 0) || (!isLogin && i === 1)) && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-violet-500 to-purple-500"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF]"
                   />
                 )}
               </button>
@@ -310,13 +331,13 @@ function LoginPageContent() {
                   className="mt-1 w-4 h-4 rounded border-violet-300 text-violet-600 focus:ring-violet-500"
                   required
                 />
-                <label htmlFor="terms" className="text-sm text-slate-600 dark:text-slate-300">
+                <label htmlFor="terms" className="text-sm text-gray-600">
                   I have read and agree to the{" "}
-                  <Link href="/terms" className="text-violet-600 hover:text-violet-700 underline">
+                  <Link href="/terms" className="text-[#165DFC] hover:text-[#8EC6FF] underline font-semibold">
                     Terms of Service
                   </Link>{" "}
                   and{" "}
-                  <Link href="/privacy" className="text-violet-600 hover:text-violet-700 underline">
+                  <Link href="/privacy" className="text-[#165DFC] hover:text-[#8EC6FF] underline font-semibold">
                     Privacy Policy
                   </Link>
                 </label>
@@ -327,31 +348,33 @@ function LoginPageContent() {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  className="text-sm text-violet-600 hover:text-violet-700 font-medium"
+                  className="text-sm text-[#165DFC] hover:text-[#8EC6FF] font-semibold"
                 >
                   Forgot password?
                 </button>
               </div>
             )}
 
-            <Button
+            <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base rounded-full font-bold bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white shadow-xl"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               {isLoading ? (
                 <motion.div
-                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full mx-auto"
                   animate={{ rotate: 360 }}
                   transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                 />
               ) : (
                 <>
                   {isLogin ? "Sign In" : "Create Account"}
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <ArrowRight className="w-5 h-5 ml-2 inline" />
                 </>
               )}
-            </Button>
+            </motion.button>
 
             {/* Divider */}
             <div className="relative my-6">
@@ -364,11 +387,12 @@ function LoginPageContent() {
             </div>
 
             {/* Google Sign In */}
-            <Button
+            <motion.button
               type="button"
-              variant="outline"
               onClick={handleGoogleSignIn}
-              className="w-full h-12 text-base"
+              className="w-full h-12 text-base rounded-full font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-[#165DFC] hover:text-[#165DFC] transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
@@ -389,7 +413,7 @@ function LoginPageContent() {
                 />
               </svg>
               Continue with Google
-            </Button>
+            </motion.button>
           </form>
         </motion.div>
 
@@ -398,14 +422,14 @@ function LoginPageContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-center text-sm text-slate-500 mt-6"
+          className="text-center text-sm text-gray-500 mt-6"
         >
           By continuing, you agree to our{" "}
-          <Link href="/terms" className="text-violet-600 hover:underline">
+          <Link href="/terms" className="text-[#165DFC] hover:underline font-semibold">
             Terms of Service
           </Link>{" "}
           and{" "}
-          <Link href="/privacy" className="text-violet-600 hover:underline">
+          <Link href="/privacy" className="text-[#165DFC] hover:underline font-semibold">
             Privacy Policy
           </Link>
         </motion.p>

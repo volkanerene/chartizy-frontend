@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,7 +50,8 @@ export function CaptionEditor({ captions, onCaptionChange, isOpen, onClose }: Ca
         className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-white rounded-2xl shadow-2xl border-2 border-blue-100 p-6 w-full max-w-lg"
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-bold text-slate-900">
+          <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <Type className="w-5 h-5" />
             Edit Captions
           </h3>
           <Button variant="ghost" size="icon" onClick={onClose}>

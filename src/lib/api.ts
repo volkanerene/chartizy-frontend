@@ -84,6 +84,23 @@ export const templatesApi = {
 
   getById: (id: string, token?: string) =>
     apiRequest<Template>(`/templates/${id}`, { token }),
+
+  generatePreviews: (token: string) =>
+    apiRequest<{
+      total: number;
+      processed: number;
+      skipped: number;
+      failed: number;
+      details: Array<{
+        template_id: string;
+        template_name: string;
+        status: string;
+        reason?: string;
+      }>;
+    }>("/templates/generate-previews", {
+      method: "POST",
+      token,
+    }),
 };
 
 // Charts API

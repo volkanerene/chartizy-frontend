@@ -1,22 +1,22 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { BarChart3, LineChart, PieChart, TrendingUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface ChartType {
   id: string;
   name: string;
-  icon: () => null;
+  icon: React.ElementType;
   description: string;
 }
 
 const chartTypes: ChartType[] = [
-  { id: "bar", name: "Bar Chart", icon: () => null, description: "Compare values across categories" },
-  { id: "line", name: "Line Chart", icon: () => null, description: "Show trends over time" },
-  { id: "pie", name: "Pie Chart", icon: () => null, description: "Show proportions" },
-  { id: "combo", name: "Combo Chart", icon: () => null, description: "Bar + Line combination" },
+  { id: "bar", name: "Bar Chart", icon: BarChart3, description: "Compare values across categories" },
+  { id: "line", name: "Line Chart", icon: LineChart, description: "Show trends over time" },
+  { id: "pie", name: "Pie Chart", icon: PieChart, description: "Show proportions" },
+  { id: "combo", name: "Combo Chart", icon: TrendingUp, description: "Bar + Line combination" },
 ];
 
 interface ChartTypeSelectorProps {
@@ -67,6 +67,10 @@ export function ChartTypeSelector({ currentType, onSelect, isOpen, onClose }: Ch
                       : "border-blue-100 hover:border-blue-300 bg-white"
                   )}
                 >
+                  <type.icon className={cn(
+                    "w-8 h-8 mb-2",
+                    currentType === type.id ? "text-blue-600" : "text-blue-400"
+                  )} />
                   <div className="font-semibold text-slate-900 mb-1">{type.name}</div>
                   <div className="text-sm text-slate-500">{type.description}</div>
                 </motion.button>

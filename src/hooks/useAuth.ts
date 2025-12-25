@@ -119,7 +119,7 @@ export function useAuth() {
             first_name: null,
             last_name: null,
           });
-          router.push("/dashboard");
+          router.push("/onboarding");
         }
       }
     },
@@ -139,33 +139,13 @@ export function useAuth() {
 
       if (data.session) {
         setToken(data.session.access_token);
-
-        try {
-          // Fetch user data from backend
-          const userData = await authApi.me(data.session.access_token);
-          setUser({
-            id: userData.id,
-            email: userData.email,
-            subscription_tier: userData.subscription_tier as "free" | "pro",
-            chart_count: userData.chart_count,
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-          });
-          
-          // Redirect to dashboard
-          router.push("/dashboard");
-        } catch {
-          // If API call fails, set user with null names and go to dashboard
-          setUser({
-            id: data.user?.id || "",
-            email: data.user?.email || "",
-            subscription_tier: "free",
-            chart_count: 0,
-            first_name: null,
-            last_name: null,
-          });
-          router.push("/dashboard");
-        }
+        setUser({
+          id: data.user?.id || "",
+          email: data.user?.email || "",
+          subscription_tier: "free",
+          chart_count: 0,
+        });
+        router.push("/dashboard");
       } else {
         // Email confirmation required
         return { confirmEmail: true };

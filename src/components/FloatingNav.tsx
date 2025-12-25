@@ -2,14 +2,10 @@
 
 import { motion } from "framer-motion";
 import { usePathname, useRouter } from "next/navigation";
-import Link from "next/link";
-import { useStore } from "@/store/useStore";
-import Logo from "@/components/Logo";
 
 export function FloatingNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const { user } = useStore();
 
   const items = [
     { id: "/dashboard", label: "Dashboard" },
@@ -29,14 +25,21 @@ export function FloatingNav() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
       >
-        <Link href="/dashboard">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400 }}
+        <motion.div
+          className="text-3xl font-black tracking-tight cursor-pointer"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400 }}
+          onClick={() => router.push("/dashboard")}
+        >
+          <span
+            className="bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent"
+            style={{
+              textShadow: "0 0 40px rgba(22, 93, 252, 0.3)",
+            }}
           >
-            <Logo size="sm" variant="black" />
-          </motion.div>
-        </Link>
+            Chartizy
+          </span>
+        </motion.div>
       </motion.div>
 
       {/* Floating Navigation */}
@@ -49,7 +52,7 @@ export function FloatingNav() {
         <div className="flex gap-2 p-2 rounded-full bg-white/40 backdrop-blur-xl border border-white/20 shadow-2xl">
           {items.map((item) => {
             const isActive = pathname === item.id || 
-              (item.id === "/dashboard" && pathname?.startsWith("/dashboard/results"));
+              (item.id === "/dashboard" && pathname.startsWith("/dashboard/results"));
             return (
               <motion.button
                 key={item.id}

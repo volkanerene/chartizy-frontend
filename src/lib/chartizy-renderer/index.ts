@@ -1,0 +1,1 @@
+export { ChartizyCanvasRenderer } from "./renderer";
