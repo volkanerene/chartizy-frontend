@@ -17,7 +17,7 @@ import {
   ChartData,
   TooltipItem,
 } from "chart.js";
-import { Line, Bar, Pie, Doughnut, Radar, Chart } from "react-chartjs-2";
+import { Line, Bar, Pie, Doughnut, Radar } from "react-chartjs-2";
 import dynamic from "next/dynamic";
 
 // Dynamically import Plotly to avoid SSR issues
@@ -49,7 +49,6 @@ interface InteractiveChartProps {
       }>;
     };
     options?: Record<string, unknown>;
-    fontFamily?: string;
   };
   height?: number;
   showPercentChange?: boolean;
@@ -102,9 +101,6 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
   const labels = rawData.labels || [];
   const datasets = rawData.datasets || [];
   const values = datasets[0]?.data || [];
-  
-  // Check if this is a combo chart (mixed types)
-  const isComboChart = chartType === "combo" || datasets.some((ds: any) => ds.type);
 
   // Calculate percentage changes
   const percentChanges = values.map((val, i) => {
@@ -126,7 +122,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
     padding: 16,
     boxPadding: 8,
     usePointStyle: true,
-    titleFont: { size: 14, weight: "bold" as const },
+    titleFont: { size: 14, weight: "600" as const },
     bodyFont: { size: 13 },
     displayColors: true,
     callbacks: {
@@ -136,27 +132,13 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
       label: (item: TooltipItem<"bar" | "line">) => {
         const value = item.raw as number;
         const index = item.dataIndex;
-        const datasetIndex = item.datasetIndex || 0;
-        const dataset = datasets[datasetIndex];
-        const datasetValues = dataset?.data as number[] || [];
+        let label = `Value: ${value.toLocaleString()}`;
         
-        let label = `${dataset?.label || "Value"}: ${value.toLocaleString()}`;
-        
-        // Enhanced comparison for line charts
-        if (chartType === "line" && showPercentChange && index > 0 && datasetValues.length > index - 1) {
-          const prev = datasetValues[index - 1];
-          if (prev !== undefined && prev !== 0) {
-            const change = ((value - prev) / prev) * 100;
-            const diff = value - prev;
-            const sign = change >= 0 ? "+" : "";
-            const arrow = change >= 0 ? "↑" : "↓";
-            label += `\n${arrow} ${sign}${change.toFixed(1)}% (${sign}${diff.toLocaleString()}) vs previous`;
-          }
-        } else if (showPercentChange && index > 0 && percentChanges[index] !== null) {
+        if (showPercentChange && index > 0 && percentChanges[index] !== null) {
           const change = percentChanges[index]!;
           const sign = change >= 0 ? "+" : "";
-          const arrow = change >= 0 ? "↑" : "↓";
-          label += `\n${arrow} ${sign}${change.toFixed(1)}% from previous`;
+          const emoji = change >= 0 ? "📈" : "📉";
+          label += `\n${emoji} ${sign}${change.toFixed(1)}% from previous`;
         }
         
         return label;
@@ -194,7 +176,6 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
         font: {
           size: 18,
           weight: "bold" as const,
-          family: chartConfig.fontFamily || "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
         },
         color: theme === "dark" ? "#F8FAFC" : "#1E293B",
         padding: {
@@ -210,11 +191,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
           usePointStyle: true,
           pointStyle: "circle",
           padding: 20,
-          font: { 
-            size: 12, 
-            weight: "normal" as const,
-            family: chartConfig.fontFamily || "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-          },
+          font: { size: 12, weight: "500" },
           color: theme === "dark" ? "#CBD5E1" : "#64748B",
         },
       },
@@ -229,10 +206,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
           display: false,
         },
         ticks: {
-          font: { 
-            size: 12,
-            family: chartConfig.fontFamily || "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-          },
+          font: { size: 12 },
           color: theme === "dark" ? "#94A3B8" : "#64748B",
           padding: 8,
         },
@@ -243,8 +217,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
           text: datasets[0]?.label || "Value",
           font: {
             size: 14,
-            weight: "bold" as const,
-            family: chartConfig.fontFamily || "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
+            weight: "600",
           },
           color: theme === "dark" ? "#CBD5E1" : "#64748B",
           padding: {
@@ -259,10 +232,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
           display: false,
         },
         ticks: {
-          font: { 
-            size: 12,
-            family: chartConfig.fontFamily || "'Geist', -apple-system, BlinkMacSystemFont, sans-serif",
-          },
+          font: { size: 12 },
           color: theme === "dark" ? "#94A3B8" : "#64748B",
           padding: 8,
           callback: (value) => {
@@ -285,83 +255,34 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
 
   // Prepare chart data with styling
   const prepareData = (): ChartData<"bar" | "line" | "pie" | "doughnut" | "radar"> => {
-    const styledDatasets = datasets.map((ds: any, i) => {
-      const datasetType = ds.type || chartType;
-      return {
-        ...ds,
-        type: isComboChart ? (ds.type || (i === 0 ? "bar" : "line")) : undefined,
-        backgroundColor: ds.backgroundColor || (datasetType === "line" 
-          ? `rgba(139, 92, 246, 0.2)` 
-          : defaultColors[i] || defaultColors[0]),
-        borderColor: ds.borderColor || borderColors[i] || borderColors[0],
-        borderWidth: datasetType === "line" ? 3 : 0,
-        borderRadius: datasetType === "bar" ? 8 : 0,
-        tension: datasetType === "line" ? 0.4 : 0,
-        fill: datasetType === "line" || datasetType === "area",
-        pointRadius: datasetType === "line" ? 0 : undefined,
-        pointHoverRadius: datasetType === "line" ? 6 : undefined,
-        pointBackgroundColor: datasetType === "line" ? borderColors[i] || borderColors[0] : undefined,
-        pointBorderColor: datasetType === "line" ? "#fff" : undefined,
-        pointBorderWidth: datasetType === "line" ? 2 : undefined,
-        hoverBackgroundColor: datasetType === "bar" 
-          ? (Array.isArray(ds.backgroundColor) ? ds.backgroundColor : [ds.backgroundColor || defaultColors[i] || defaultColors[0]].map(c => c.replace("0.8", "1")))
-          : undefined,
-      };
-    });
+    const styledDatasets = datasets.map((ds, i) => ({
+      ...ds,
+      backgroundColor: ds.backgroundColor || (chartType === "line" 
+        ? `rgba(139, 92, 246, 0.2)` 
+        : defaultColors),
+      borderColor: ds.borderColor || borderColors[i] || borderColors[0],
+      borderWidth: chartType === "line" ? 3 : 0,
+      borderRadius: chartType === "bar" ? 8 : 0,
+      tension: chartType === "line" ? 0.4 : 0,
+      fill: chartType === "line" || chartType === "area",
+      pointRadius: chartType === "line" ? 0 : undefined,
+      pointHoverRadius: chartType === "line" ? 6 : undefined,
+      pointBackgroundColor: chartType === "line" ? borderColors[0] : undefined,
+      pointBorderColor: chartType === "line" ? "#fff" : undefined,
+      pointBorderWidth: chartType === "line" ? 2 : undefined,
+      hoverBackgroundColor: chartType === "bar" 
+        ? defaultColors.map(c => c.replace("0.8", "1"))
+        : undefined,
+    }));
 
     return {
       labels,
-      datasets: styledDatasets as any,
+      datasets: styledDatasets,
     };
   };
 
   const renderChart = () => {
     const data = prepareData();
-
-    // Combo chart (bar + line)
-    if (isComboChart) {
-      return (
-        <Chart
-          ref={chartRef as never}
-          type="bar"
-          data={data as any}
-          options={{
-            ...baseOptions,
-            plugins: {
-              ...baseOptions.plugins,
-              tooltip: {
-                ...tooltipConfig,
-                callbacks: {
-                  ...tooltipConfig.callbacks,
-                  label: (item: TooltipItem<"bar" | "line">) => {
-                    const value = item.raw as number;
-                    const index = item.dataIndex;
-                    const datasetIndex = item.datasetIndex || 0;
-                    const dataset = datasets[datasetIndex];
-                    const datasetType = (dataset as any)?.type || (datasetIndex === 0 ? "bar" : "line");
-                    let label = `${dataset?.label || `Dataset ${datasetIndex + 1}`}: ${value.toLocaleString()}`;
-                    
-                    if (datasetType === "line" && showPercentChange && index > 0) {
-                      const datasetValues = dataset?.data as number[] || [];
-                      if (datasetValues.length > index && datasetValues[index - 1] !== undefined) {
-                        const prev = datasetValues[index - 1];
-                        if (prev !== 0) {
-                          const change = ((value - prev) / prev) * 100;
-                          const sign = change >= 0 ? "+" : "";
-                          label += ` (${sign}${change.toFixed(1)}% vs previous)`;
-                        }
-                      }
-                    }
-                    
-                    return label;
-                  },
-                },
-              } as never,
-            },
-          } as ChartOptions<"bar">}
-        />
-      );
-    }
 
     switch (chartType) {
       case "line":
@@ -537,11 +458,9 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
 
           return (
             <Plot
-              data={[plotlyConfig] as any}
+              data={[plotlyConfig]}
               layout={{
-                title: {
-                  text: (chartConfig.options as any)?.title?.text || "",
-                },
+                title: chartConfig.options?.title?.text || "",
                 scene: {
                   xaxis: { title: "X Axis" },
                   yaxis: { title: "Y Axis" },
@@ -552,7 +471,7 @@ export const InteractiveChart = forwardRef<InteractiveChartRef, InteractiveChart
                 margin: { l: 0, r: 0, t: 40, b: 0 },
                 paper_bgcolor: "transparent",
                 plot_bgcolor: "transparent",
-              } as any}
+              }}
               style={{ width: "100%", height: "100%" }}
               config={{ responsive: true, displayModeBar: true }}
             />

@@ -11,10 +11,10 @@ interface GradientButtonProps
   isLoading?: boolean;
 }
 
-const colorVariants = {
-  primary: "bg-blue-600 hover:bg-blue-700",
-  secondary: "bg-blue-500 hover:bg-blue-600",
-  success: "bg-blue-600 hover:bg-blue-700",
+const gradientVariants = {
+  primary: "from-blue-500 via-indigo-500 to-cyan-500",
+  secondary: "from-cyan-500 via-blue-500 to-indigo-500",
+  success: "from-emerald-500 via-green-500 to-teal-500",
 };
 
 const sizeVariants = {
@@ -48,15 +48,31 @@ export const GradientButton = forwardRef<HTMLButtonElement, GradientButtonProps>
         whileTap={{ scale: disabled || isLoading ? 1 : 0.98 }}
         className={cn(
           "relative inline-flex items-center justify-center gap-2 rounded-xl font-semibold text-white shadow-lg transition-all duration-300",
-          colorVariants[variant],
+          "bg-gradient-to-r",
+          gradientVariants[variant],
           sizeVariants[size],
           "shadow-blue-500/30 hover:shadow-blue-500/50",
           "disabled:opacity-50 disabled:cursor-not-allowed",
+          "overflow-hidden",
           className
         )}
         disabled={disabled || isLoading}
         {...(props as any)}
       >
+        {/* Animated shine effect */}
+        <motion.div
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full"
+          animate={{
+            translateX: ["−100%", "200%"],
+          }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            repeatDelay: 3,
+            ease: "easeInOut",
+          }}
+        />
+
         {isLoading ? (
           <>
             <svg

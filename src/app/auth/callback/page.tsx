@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, Suspense } from "react";
+import { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { useStore } from "@/store/useStore";
 import { authApi } from "@/lib/api";
 
-function AuthCallbackContent() {
+export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setUser, setToken } = useStore();
@@ -118,8 +118,12 @@ function AuthCallbackContent() {
           last_name: userData.last_name,
         });
         
-        // Redirect to dashboard
-        router.replace("/dashboard");
+        // Check if user needs onboarding
+        if (!userData.first_name || !userData.last_name) {
+          router.replace("/onboarding");
+        } else {
+          router.replace("/dashboard");
+        }
       } catch (apiError) {
         console.error("API error fetching user data:", apiError);
         // Fallback to Supabase user data
@@ -132,7 +136,7 @@ function AuthCallbackContent() {
             first_name: null,
             last_name: null,
           });
-          router.replace("/dashboard");
+          router.replace("/onboarding");
         } else {
           router.replace("/login?error=user_data_error");
         }
@@ -149,21 +153,6 @@ function AuthCallbackContent() {
         <p className="text-slate-600">Completing sign in...</p>
       </div>
     </div>
-  );
-}
-
-export default function AuthCallbackPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto mb-4"></div>
-          <p className="text-slate-600">Loading...</p>
-        </div>
-      </div>
-    }>
-      <AuthCallbackContent />
-    </Suspense>
   );
 }
 

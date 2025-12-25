@@ -109,21 +109,6 @@ export const chartsApi = {
   getById: (id: string, token: string) =>
     apiRequest<Chart>(`/chart/${id}`, { token }),
 
-  update: (
-    id: string,
-    data: {
-      result_visual?: string;
-      result_code?: string;
-      title?: string;
-    },
-    token: string
-  ) =>
-    apiRequest<{ success: boolean; message: string; chart: Chart }>(`/chart/${id}`, {
-      method: "PUT",
-      body: data,
-      token,
-    }),
-
   delete: (id: string, token: string) =>
     apiRequest<{ success: boolean; message: string }>(`/chart/${id}`, {
       method: "DELETE",
@@ -191,7 +176,7 @@ export const aiApi = {
 // Profile API
 export const profileApi = {
   updateProfile: (data: { first_name?: string; last_name?: string }, token: string) =>
-    apiRequest<{ success: boolean; first_name?: string; last_name?: string }>("/profile/update", {
+    apiRequest<{ success: boolean; message: string; first_name?: string; last_name?: string }>("/profile/update", {
       method: "PUT",
       body: data,
       token,

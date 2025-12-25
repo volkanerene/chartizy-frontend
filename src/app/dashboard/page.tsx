@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
+import { Plus, BarChart3, TrendingUp, Clock, Sparkles } from "lucide-react";
 import { useStore } from "@/store/useStore";
 import { chartsApi, paymentApi } from "@/lib/api";
 import { ChartCard } from "@/components/ChartCard";
+import { GradientButton } from "@/components/GradientButton";
 import { LoadingAnimation } from "@/components/LoadingAnimation";
-import { InteractiveChart } from "@/components/InteractiveChart";
 import { cn } from "@/lib/utils";
 
 export default function DashboardPage() {
@@ -62,183 +63,161 @@ export default function DashboardPage() {
   }, [user?.id, token, setUserCharts]);
 
   const isPro = user?.subscription_tier === "pro";
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-
   const stats = [
-    { label: "Total Charts", value: userCharts.length.toString(), change: `+${userCharts.filter(c => {
-      const created = new Date(c.created_at);
-      const now = new Date();
-      const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-      return created > monthAgo;
-    }).length}` },
-    { label: "Charts Left", value: isPro ? "∞" : (chartQuota.limit - chartQuota.used).toString(), change: isPro ? "∞" : "" },
-    { label: "This Month", value: userCharts.filter(c => {
-      const created = new Date(c.created_at);
-      const now = new Date();
-      return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
-    }).length.toString(), change: "+0" },
+    {
+      label: "Total Charts",
+      value: userCharts.length,
+      icon: BarChart3,
+      color: "from-violet-500 to-purple-500",
+    },
+    {
+      label: "Charts Left",
+      value: isPro ? "∞" : chartQuota.limit - chartQuota.used,
+      icon: TrendingUp,
+      color: "from-cyan-500 to-blue-500",
+    },
+    {
+      label: "This Month",
+      value: userCharts.filter(c => {
+        const created = new Date(c.created_at);
+        const now = new Date();
+        return created.getMonth() === now.getMonth() && created.getFullYear() === now.getFullYear();
+      }).length,
+      icon: Clock,
+      color: "from-pink-500 to-rose-500",
+    },
   ];
 
   return (
-    <motion.div
-      className="min-h-screen px-8"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          className="mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <h1 className="text-6xl font-black mb-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent">
-            Your Charts
+    <div className="space-y-8">
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
+      >
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 dark:text-slate-100">
+            Welcome back{user?.email ? `, ${user.email.split("@")[0]}` : ""}!
           </h1>
-          <p className="text-gray-500 text-xl">
-            AI-generated visualizations at your fingertips
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Here&apos;s an overview of your charts and activity.
           </p>
-        </motion.div>
+        </div>
+        <Link href="/dashboard/generate">
+          <GradientButton className="w-full sm:w-auto">
+            <Plus className="w-5 h-5" />
+            Create Chart
+          </GradientButton>
+        </Link>
+      </motion.div>
 
-        {/* Stats */}
-        <motion.div
-          className="grid grid-cols-3 gap-6 mb-12"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-        >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={index}
-              className="relative group"
-              whileHover={{ scale: 1.05, y: -5 }}
-              transition={{ type: "spring", stiffness: 400 }}
+      {/* Stats Grid */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.1 }}
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+      >
+        {stats.map((stat, i) => (
+          <motion.div
+            key={stat.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 + i * 0.1 }}
+            className="relative overflow-hidden rounded-2xl bg-white/70 dark:bg-slate-800/70 backdrop-blur-xl border-2 border-violet-100/50 dark:border-slate-700/50 p-6 shadow-lg shadow-violet-500/5 dark:shadow-slate-900/20"
+          >
+            <div className={cn(
+              "absolute top-0 right-0 w-32 h-32 -mr-8 -mt-8 rounded-full opacity-10 bg-gradient-to-br",
+              stat.color
+            )} />
+            <div className={cn(
+              "inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br shadow-lg mb-4",
+              stat.color
+            )}>
+              <stat.icon className="w-6 h-6 text-white" />
+            </div>
+            <p className="text-3xl font-bold text-slate-900 dark:text-slate-100">{stat.value}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{stat.label}</p>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      {/* Charts Section */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Your Charts</h2>
+          {userCharts.length > 0 && (
+            <Link
+              href="/dashboard/templates"
+              className="text-sm text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium"
             >
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-br from-[#165DFC]/10 to-[#8EC6FF]/10 rounded-3xl blur-xl"
-                animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.5, 0.3],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  delay: index * 0.2,
-                }}
-              />
-              <div className="relative bg-white/50 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-xl">
-                <div className="text-sm text-gray-700 font-semibold mb-2">{stat.label}</div>
-                <div className="text-5xl font-black bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent">
-                  {stat.value}
-                </div>
-                {stat.change && (
-                  <div className="text-xs text-green-600 font-semibold mt-2">
-                    {stat.change}
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+              View All Templates →
+            </Link>
+          )}
+        </div>
 
-        {/* Charts Grid */}
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <LoadingAnimation text="Loading your charts..." />
           </div>
-        ) : userCharts.length === 0 ? (
-          <motion.div
-            className="text-center py-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="text-gray-400 text-xl mb-8">No charts yet</div>
-            <motion.button
-              className="px-8 py-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white rounded-full font-bold shadow-xl"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => router.push("/dashboard/generate")}
-            >
-              Create Your First Chart
-            </motion.button>
-          </motion.div>
+        ) : userCharts.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {userCharts.slice(0, 6).map((chart, i) => (
+              <motion.div
+                key={chart.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.05 }}
+              >
+                <ChartCard
+                  chart={chart}
+                  onClick={() => {
+                    router.push(`/dashboard/results/${chart.id}`);
+                  }}
+                  onDelete={async () => {
+                    if (!token) return;
+                    try {
+                      await chartsApi.delete(chart.id, token);
+                      setUserCharts(userCharts.filter((c) => c.id !== chart.id));
+                    } catch (error) {
+                      console.error("Failed to delete chart:", error);
+                    }
+                  }}
+                />
+              </motion.div>
+            ))}
+          </div>
         ) : (
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-16 px-4 rounded-3xl bg-gradient-to-br from-violet-50 to-purple-50 border-2 border-dashed border-violet-200"
           >
-            {userCharts.slice(0, 6).map((chart, index) => {
-              let chartConfig = null;
-              try {
-                if (chart.result_visual) {
-                  chartConfig = JSON.parse(chart.result_visual);
-                }
-              } catch {
-                // Ignore parse errors
-              }
-
-              return (
-                <motion.div
-                  key={chart.id}
-                  className="relative group cursor-pointer"
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 * index }}
-                  whileHover={{ scale: 1.03, y: -8 }}
-                  onMouseEnter={() => setHoveredCard(chart.id)}
-                  onMouseLeave={() => setHoveredCard(null)}
-                  onClick={() => router.push(`/dashboard/results/${chart.id}`)}
-                >
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-br from-[#165DFC]/20 to-[#8EC6FF]/20 rounded-3xl blur-xl"
-                    animate={{
-                      scale: hoveredCard === chart.id ? 1.1 : 1,
-                      opacity: hoveredCard === chart.id ? 0.6 : 0.3,
-                    }}
-                    transition={{ duration: 0.3 }}
-                  />
-                  <div className="relative bg-white/50 backdrop-blur-xl rounded-3xl p-6 border border-white/20 shadow-xl overflow-hidden">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 mb-1">
-                          {chartConfig?.data?.title || chartConfig?.options?.title?.text || `Chart ${chart.id.slice(0, 8)}`}
-                        </h3>
-                        <p className="text-xs text-gray-500">
-                          {new Date(chart.created_at).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">
-                        {chartConfig?.type || "Bar"}
-                      </span>
-                    </div>
-                    {chartConfig ? (
-                      <div className="h-[120px] bg-white rounded-lg p-2">
-                        <InteractiveChart
-                          chartConfig={chartConfig}
-                          height={120}
-                          showPercentChange={false}
-                          animated={false}
-                          theme="light"
-                        />
-                      </div>
-                    ) : (
-                      <div className="h-[120px] flex items-center justify-center text-gray-400 bg-gray-50 rounded-lg">
-                        No preview
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
+            <div className="w-20 h-20 mx-auto rounded-2xl bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center mb-6">
+              <Sparkles className="w-10 h-10 text-violet-500" />
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2">
+              No charts yet
+            </h3>
+            <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
+              Start by selecting a template and let AI generate beautiful
+              visualizations from your data.
+            </p>
+            <Link href="/dashboard/templates">
+              <GradientButton>
+                <Plus className="w-5 h-5" />
+                Create Your First Chart
+              </GradientButton>
+            </Link>
           </motion.div>
         )}
-      </div>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 

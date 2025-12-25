@@ -2,13 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import { Check, Crown, Zap, ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GradientButton } from "@/components/GradientButton";
 import { BarChart3 } from "lucide-react";
-import Logo from "@/components/Logo";
-import { BlobBackground } from "@/components/BlobBackground";
 
 const plans = [
   {
@@ -49,7 +46,7 @@ const plans = [
       "White-label options",
     ],
     limitations: [],
-    color: "from-blue-500 to-blue-600",
+    color: "from-violet-500 to-purple-600",
     buttonText: "Upgrade to Pro",
     popular: true,
   },
@@ -83,106 +80,58 @@ const faqs = [
 ];
 
 export default function PricingPage() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({
-        x: (e.clientX / window.innerWidth - 0.5) * 20,
-        y: (e.clientY / window.innerHeight - 0.5) * 20,
-      });
-    };
-
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 overflow-hidden relative">
-      {/* Parallax Background */}
-      <motion.div
-        className="fixed inset-0 z-0"
-        animate={{
-          x: mousePosition.x,
-          y: mousePosition.y,
-        }}
-        transition={{ type: "spring", stiffness: 50, damping: 20 }}
-      >
-        <BlobBackground />
-      </motion.div>
-
-      {/* Cursor Glow */}
-      <motion.div
-        className="fixed w-96 h-96 rounded-full pointer-events-none z-50 mix-blend-screen"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(22, 93, 252, 0.15) 0%, transparent 70%)",
-        }}
-        animate={{
-          x: mousePosition.x * 2,
-          y: mousePosition.y * 2,
-        }}
-        transition={{ type: "spring", stiffness: 100, damping: 30 }}
-      />
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-violet-50/30 to-cyan-50/30">
       {/* Navigation */}
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        className="fixed top-0 left-0 right-0 z-50 bg-white/40 backdrop-blur-xl border-b border-white/20"
+        className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-violet-100"
       >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/">
-            <Logo size="sm" variant="default" />
+          <Link href="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+              <BarChart3 className="w-6 h-6 text-white" />
+            </div>
+            <span className="font-bold text-xl text-slate-900">Graphzy</span>
           </Link>
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/#features" className="text-gray-700 hover:text-[#165DFC] transition-colors font-semibold">
+            <Link href="/#features" className="text-slate-600 hover:text-violet-600 transition-colors">
               Features
             </Link>
-            <Link href="/#how-it-works" className="text-gray-700 hover:text-[#165DFC] transition-colors font-semibold">
+            <Link href="/#how-it-works" className="text-slate-600 hover:text-violet-600 transition-colors">
               How It Works
             </Link>
-            <Link href="/pricing" className="text-[#165DFC] font-bold">
+            <Link href="/pricing" className="text-violet-600 font-medium">
               Pricing
             </Link>
-            <Link href="/mobile" className="text-gray-700 hover:text-[#165DFC] transition-colors font-semibold">
+            <Link href="/mobile" className="text-slate-600 hover:text-violet-600 transition-colors">
               Mobile
             </Link>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/login">
-              <motion.button
-                className="px-6 py-2 rounded-full font-semibold text-gray-700 hover:text-[#165DFC] transition-colors"
-                whileHover={{ scale: 1.05 }}
-              >
-                Sign In
-              </motion.button>
+              <Button variant="ghost">Sign In</Button>
             </Link>
             <Link href="/login">
-              <motion.button
-                className="px-6 py-3 rounded-full font-bold bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white shadow-xl"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Get Started
-              </motion.button>
+              <GradientButton>Get Started</GradientButton>
             </Link>
           </div>
         </div>
       </motion.nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-8">
+      <section className="pt-32 pb-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-7xl font-black mb-6 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-violet-600 via-purple-600 to-cyan-600 bg-clip-text text-transparent">
               Simple, Transparent Pricing
             </h1>
-            <p className="text-xl text-gray-500 mb-12">
+            <p className="text-xl text-slate-600 mb-12">
               Choose the plan that's right for you. Upgrade or downgrade at any time.
             </p>
           </motion.div>
@@ -190,7 +139,7 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Cards */}
-      <section className="pb-20 px-8">
+      <section className="pb-20 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8">
             {plans.map((plan, i) => (
@@ -202,13 +151,13 @@ export default function PricingPage() {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className={`relative p-8 rounded-3xl border-2 transition-all ${
                   plan.popular
-                    ? "bg-gradient-to-br from-[#165DFC]/10 to-[#8EC6FF]/10 border-[#165DFC] shadow-2xl"
-                    : "bg-white/50 backdrop-blur-xl border-white/20"
+                    ? "bg-gradient-to-br from-violet-50 to-purple-50 border-violet-300 shadow-2xl shadow-violet-500/20"
+                    : "bg-white/70 backdrop-blur-xl border-violet-100"
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className="px-4 py-1 rounded-full bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white text-sm font-bold flex items-center gap-1">
+                    <span className="px-4 py-1 rounded-full bg-gradient-to-r from-violet-500 to-purple-600 text-white text-sm font-medium flex items-center gap-1">
                       <Crown className="w-4 h-4" />
                       Most Popular
                     </span>
@@ -216,15 +165,15 @@ export default function PricingPage() {
                 )}
 
                 <div className="mb-6">
-                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] flex items-center justify-center mb-4`}>
+                  <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${plan.color} flex items-center justify-center mb-4`}>
                     <plan.icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-3xl font-black text-gray-900 mb-2">{plan.name}</h3>
-                  <p className="text-gray-600 mb-4">{plan.description}</p>
+                  <h3 className="text-3xl font-bold text-slate-900 mb-2">{plan.name}</h3>
+                  <p className="text-slate-600 mb-4">{plan.description}</p>
                   <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-black bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent">{plan.price}</span>
+                    <span className="text-5xl font-bold text-slate-900">{plan.price}</span>
                     {plan.period && (
-                      <span className="text-gray-500">/{plan.period}</span>
+                      <span className="text-slate-500">/{plan.period}</span>
                     )}
                   </div>
                 </div>
@@ -260,22 +209,14 @@ export default function PricingPage() {
 
                 <Link href={plan.name === "Free" ? "/login" : "/login"}>
                   {plan.popular ? (
-                    <motion.button
-                      className="w-full text-lg py-6 rounded-full font-bold bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] text-white shadow-xl"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
+                    <GradientButton className="w-full text-lg py-6">
                       {plan.buttonText}
-                      <ArrowRight className="w-5 h-5 ml-2 inline" />
-                    </motion.button>
+                      <ArrowRight className="w-5 h-5 ml-2" />
+                    </GradientButton>
                   ) : (
-                    <motion.button
-                      className="w-full text-lg py-6 rounded-full font-bold border-2 border-gray-200 text-gray-700 hover:border-[#165DFC] hover:text-[#165DFC] transition-colors"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
+                    <Button variant="outline" className="w-full text-lg py-6 border-2">
                       {plan.buttonText}
-                    </motion.button>
+                    </Button>
                   )}
                 </Link>
               </motion.div>
@@ -285,7 +226,7 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-8">
+      <section className="py-20 px-6 bg-white/50">
         <div className="max-w-4xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -294,10 +235,10 @@ export default function PricingPage() {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h2 className="text-6xl font-black mb-4 bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] bg-clip-text text-transparent">
+            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
               Frequently Asked Questions
             </h2>
-            <p className="text-xl text-gray-500">
+            <p className="text-xl text-slate-600">
               Everything you need to know about our pricing
             </p>
           </motion.div>
@@ -310,10 +251,10 @@ export default function PricingPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.6 }}
-                className="p-6 rounded-3xl bg-white/50 backdrop-blur-xl border border-white/20 shadow-xl"
+                className="p-6 rounded-2xl bg-white/70 backdrop-blur-xl border border-violet-100"
               >
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{faq.question}</h3>
-                <p className="text-gray-600">{faq.answer}</p>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">{faq.question}</h3>
+                <p className="text-slate-600">{faq.answer}</p>
               </motion.div>
             ))}
           </div>
@@ -321,30 +262,26 @@ export default function PricingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-8">
+      <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="p-12 rounded-3xl bg-gradient-to-r from-[#165DFC] to-[#8EC6FF] shadow-2xl"
+            className="p-12 rounded-3xl bg-gradient-to-br from-violet-600 to-purple-600"
           >
-            <h2 className="text-5xl md:text-6xl font-black text-white mb-6">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
               Ready to Get Started?
             </h2>
-            <p className="text-xl text-white/90 mb-8">
+            <p className="text-xl text-violet-100 mb-8">
               Join thousands of users creating amazing charts with AI
             </p>
             <Link href="/login">
-              <motion.button
-                className="px-8 py-4 rounded-full font-bold bg-white text-[#165DFC] shadow-xl text-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <GradientButton size="lg" className="text-lg px-8 py-6 bg-white text-violet-600 hover:bg-violet-50">
                 Start Creating Free
-                <ArrowRight className="w-5 h-5 ml-2 inline" />
-              </motion.button>
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </GradientButton>
             </Link>
           </motion.div>
         </div>
